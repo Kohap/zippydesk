@@ -1,0 +1,21 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/icon.svg/route": "/icon.svg",
+  "/api/dashboard/route": "/api/dashboard",
+  "/api/maintenance/run/route": "/api/maintenance/run",
+  "/api/health/route": "/api/health",
+  "/api/auth/select/route": "/api/auth/select",
+  "/api/merchant/status/route": "/api/merchant/status",
+  "/api/orders/[id]/[action]/route": "/api/orders/[id]/[action]",
+  "/api/wallet/auto-recharge/route": "/api/wallet/auto-recharge",
+  "/api/orders/[id]/route": "/api/orders/[id]",
+  "/api/wallet/topup/route": "/api/wallet/topup",
+  "/api/webhook/route": "/api/webhook",
+  "/api/inventory/[sku]/route": "/api/inventory/[sku]",
+  "/api/leads/route": "/api/leads",
+  "/page": "/",
+  "/(app)/inventory/page": "/inventory",
+  "/(app)/billing/page": "/billing",
+  "/(app)/activity/page": "/activity",
+  "/(app)/dashboard/page": "/dashboard"
+}

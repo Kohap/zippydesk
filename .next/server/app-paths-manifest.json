@@ -1,0 +1,21 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/icon.svg/route": "app/icon.svg/route.js",
+  "/api/dashboard/route": "app/api/dashboard/route.js",
+  "/api/maintenance/run/route": "app/api/maintenance/run/route.js",
+  "/api/health/route": "app/api/health/route.js",
+  "/api/auth/select/route": "app/api/auth/select/route.js",
+  "/api/merchant/status/route": "app/api/merchant/status/route.js",
+  "/api/orders/[id]/[action]/route": "app/api/orders/[id]/[action]/route.js",
+  "/api/wallet/auto-recharge/route": "app/api/wallet/auto-recharge/route.js",
+  "/api/orders/[id]/route": "app/api/orders/[id]/route.js",
+  "/api/wallet/topup/route": "app/api/wallet/topup/route.js",
+  "/api/webhook/route": "app/api/webhook/route.js",
+  "/api/inventory/[sku]/route": "app/api/inventory/[sku]/route.js",
+  "/api/leads/route": "app/api/leads/route.js",
+  "/page": "app/page.js",
+  "/(app)/inventory/page": "app/(app)/inventory/page.js",
+  "/(app)/billing/page": "app/(app)/billing/page.js",
+  "/(app)/activity/page": "app/(app)/activity/page.js",
+  "/(app)/dashboard/page": "app/(app)/dashboard/page.js"
+}

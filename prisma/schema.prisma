@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  INTAKE
+  ORDER_PENDING_PAYMENT
+  PARTIALLY_PAID
+  PENDING_APPROVAL
+  MANUAL_VERIFICATION_REQUIRED
+  APPROVED
+  FAILED_OUT_OF_STOCK
+  PENDING_REFUND
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentVerdict {
+  applied
+  partial
+  overpayment
+  unmatched
+  duplicate
+}
+
+enum RefundStatus {
+  pending
+  refunded
+}
+
+model Merchant {
+  id           String   @id
+  slug         String   @unique
+  name         String
+  businessType String
+  phone        String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  wallet       Wallet?
+  vendors      Vendor[]
+}
+
+model Vendor {
+  id              String    @id
+  merchantId      String
+  merchant        Merchant  @relation(fields: [merchantId], references: [id])
+  name            String
+  bankAccount     String
+  narrationPrefix String
+  escalation      Json
+  timers          Json
+  active          Boolean   @default(true)
+  items           VendorItem[]
+
+  @@index([merchantId])
+}
+
+model VendorItem {
+  id        String  @id @default(cuid())
+  vendorId  String
+  vendor    Vendor  @relation(fields: [vendorId], references: [id])
+  sku       String
+  name      String
+  priceKobo Int
+  stock     Int     @default(0) @db.SmallInt
+  active    Boolean @default(true)
+
+  @@unique([vendorId, sku])
+  @@index([vendorId])
+}
+
+model Wallet {
+  id                String   @id @default(cuid())
+  merchantId        String   @unique
+  merchant          Merchant @relation(fields: [merchantId], references: [id])
+  balanceCredits    Int      @default(0)
+  lowThreshold      Int      @default(20)
+  autoRecharge      Boolean  @default(false)
+  autoRechargeAmount Int     @default(100)
+  acceptingOrders   Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  transactions      CreditTransaction[]
+}
+
+enum CreditType {
+  topup
+  consume
+  adjustment
+}
+
+model CreditTransaction {
+  id           String    @id @default(cuid())
+  walletId     String
+  wallet       Wallet    @relation(fields: [walletId], references: [id])
+  type         CreditType
+  amount       Int
+  balanceAfter Int
+  reference    String?
+  meta         Json?
+  createdAt    DateTime  @default(now())
+
+  @@index([walletId, createdAt])
+}
+
+model Lead {
+  id           String   @id @default(cuid())
+  name         String
+  shopName     String?
+  businessType String
+  phone        String
+  missedOrders Int
+  source       String   @default("landing")
+  createdAt    DateTime @default(now())
+}
+
+model Order {
+  id              String      @id
+  customerWaId    String
+  vendorId        String
+  items           Json
+  cartLocked      Boolean     @default(false)
+  totalKobo       Int         @default(0)
+  amountPaidKobo  Int         @default(0)
+  balanceDueKobo  Int         @default(0)
+  status          OrderStatus @default(ORDER_PENDING_PAYMENT)
+  escalationLevel Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  payments        Payment[]
+  events          ApprovalEvent[]
+  refund          Refund?
+
+  @@index([customerWaId, vendorId])
+  @@index([status])
+}
+
+model Payment {
+  id            String         @id
+  orderId       String
+  order         Order          @relation(fields: [orderId], references: [id])
+  amountKobo    Int
+  narration     String
+  visionJson    Json
+  receiptMsgId  String         @unique
+  verdict       PaymentVerdict
+  validationMs  Int?
+  createdAt     DateTime       @default(now())
+
+  @@index([orderId])
+}
+
+model ApprovalEvent {
+  id      String   @id
+  orderId String
+  order   Order    @relation(fields: [orderId], references: [id])
+  actor   String
+  action  String
+  at      DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model Refund {
+  id               String       @id
+  orderId          String       @unique
+  order            Order        @relation(fields: [orderId], references: [id])
+  amountKobo       Int
+  status           RefundStatus @default(pending)
+  ownerConfirmedAt DateTime?
+}
+
+model IngestedMessage {
+  msgId     String   @id
+  waId      String
+  direction String
+  status    String
+  receivedAt DateTime @default(now())
+}

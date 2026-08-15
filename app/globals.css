@@ -1,0 +1,408 @@
+@import "tailwindcss";
+
+@theme {
+  /* Surfaces: neutral slate ink, no blue cast. */
+  --color-ink: #0f1418;
+  --color-panel: #151b21;
+  --color-panel-2: #1a2229;
+  --color-panel-3: #202a32;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+
+  /* Text */
+  --color-ink-text: #e9eef2;
+  --color-ink-muted: #a2aeb8;
+  --color-ink-faint: #6b7883;
+
+  /* Brand: deep ocean to aqua (user-specified) */
+  --color-ocean: #006b8c;
+  --color-aqua: #00bca3;
+  --color-aqua-bright: #2fd8bd;
+
+  /* Semantics */
+  --color-good: #3ecf97;
+  --color-good-soft: rgba(62, 207, 151, 0.12);
+  --color-good-line: rgba(62, 207, 151, 0.28);
+  --color-good-text: #7ce0b8;
+  --color-warn: #f2b44c;
+  --color-warn-soft: rgba(242, 180, 76, 0.12);
+  --color-warn-line: rgba(242, 180, 76, 0.3);
+  --color-warn-text: #ffcf7e;
+  --color-bad: #ef5a5f;
+  --color-bad-soft: rgba(239, 90, 95, 0.12);
+  --color-bad-line: rgba(239, 90, 95, 0.3);
+  --color-bad-text: #ff8f93;
+  --color-info: #4aa3df;
+  --color-aqua-soft: rgba(0, 188, 163, 0.1);
+  --color-aqua-line: rgba(0, 188, 163, 0.3);
+  --color-aqua-text: #63e3cb;
+  --color-ocean-soft: rgba(0, 107, 140, 0.18);
+  --color-ocean-line: rgba(0, 107, 140, 0.4);
+  --color-ocean-text: #7cc6de;
+
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-chip: 6px;
+
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-ink-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(0, 188, 163, 0.28);
+  color: #f4fbff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-aqua);
+  outline-offset: 2px;
+  border-radius: var(--radius-control);
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Brand surfaces ---- */
+
+.gradient-brand {
+  background-image: linear-gradient(135deg, var(--color-ocean) 0%, var(--color-aqua) 100%);
+}
+
+.gradient-text {
+  background-image: linear-gradient(90deg, #19a8cf 0%, var(--color-aqua-bright) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Primary action: single filled brand button, no glow, no shadow, no lift. */
+.btn-brand {
+  background-image: linear-gradient(135deg, #007ba0 0%, var(--color-aqua) 100%);
+  color: #ffffff;
+}
+.btn-brand:hover {
+  background-image: linear-gradient(135deg, #0088af 0%, #16cfb3 100%);
+}
+.btn-brand:active {
+  background-image: linear-gradient(135deg, #00658a 0%, #00a88f 100%);
+}
+.btn-brand:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-ink-text);
+  border: 1px solid var(--color-line-strong);
+}
+.btn-ghost:hover {
+  background: var(--color-panel-2);
+}
+.btn-ghost:active {
+  background: var(--color-panel-3);
+}
+.btn-ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background: var(--color-panel-2);
+  color: #ff8f93;
+  border: 1px solid rgba(239, 90, 95, 0.35);
+}
+.btn-danger:hover {
+  background: rgba(239, 90, 95, 0.12);
+}
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Panel card: tonal lift over ink, quiet border. */
+.card {
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+.card-hover {
+  transition: border-color 120ms ease;
+}
+.card-hover:hover {
+  border-color: var(--color-line-strong);
+}
+
+/* Data rows: mono for real data only. */
+.data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.label-caps {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+/* Focus assist for keyboard users. */
+.assist-focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.assist-focus:focus-visible {
+  outline-color: var(--color-aqua);
+}
+
+/* Accessibility-only content. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Subtle scrollbar for tables. */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-panel-3) transparent;
+}
+
+/* Range input (calculator slider): brand thumb, no glow. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--color-panel-3);
+  accent-color: var(--color-aqua);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-aqua);
+  border: 3px solid #10171d;
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-aqua);
+  border: 3px solid #10171d;
+  cursor: pointer;
+}
+
+/* ---- Motion primitives ---- */
+
+@keyframes bubble-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes typing-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(150px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.2;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 188, 163, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 188, 163, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 188, 163, 0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes count-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes order-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(20px, -10px) scale(1.05);
+    opacity: 0.7;
+  }
+}
+
+.bubble-in {
+  opacity: 0;
+  animation: bubble-in 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.typing-dot {
+  display: inline-block;
+  animation: typing-dot 1.4s ease-in-out infinite;
+}
+
+.shimmer-text {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-ink-text) 0%,
+    var(--color-aqua-bright) 50%,
+    var(--color-ink-text) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+.pulse-ring {
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+
+.float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.count-in {
+  animation: count-in 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.order-slide-in {
+  animation: order-slide-in 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.glow-drift {
+  animation: glow-drift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-in,
+  .typing-dot,
+  .shimmer-text,
+  .pulse-ring,
+  .float-slow,
+  .count-in,
+  .order-slide-in,
+  .glow-drift {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
