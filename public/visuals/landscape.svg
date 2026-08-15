@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 666" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Sky Gradient -->
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0c1322"/>
+      <stop offset="60%" stop-color="#141d30"/>
+      <stop offset="100%" stop-color="#1c253d"/>
+    </linearGradient>
+
+    <!-- Mountain Shadows & Highlights -->
+    <linearGradient id="mountainBase" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#d4cea8"/>
+      <stop offset="100%" stop-color="#4a4c42"/>
+    </linearGradient>
+
+    <!-- Rolling Hills Gradients for Depth Layers -->
+    <linearGradient id="hillBack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2c3822"/>
+      <stop offset="100%" stop-color="#161f12"/>
+    </linearGradient>
+
+    <linearGradient id="hillMid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3b4d2a"/>
+      <stop offset="100%" stop-color="#1b2512"/>
+    </linearGradient>
+
+    <linearGradient id="hillFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4e6333"/>
+      <stop offset="50%" stop-color="#31411e"/>
+      <stop offset="100%" stop-color="#12180a"/>
+    </linearGradient>
+
+    <!-- Atmosphere/Haze Filter Effect -->
+    <filter id="haze" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <!-- 1. BACKGROUND SKY -->
+  <rect width="1000" height="666" fill="url(#skyGrad)"/>
+
+  <!-- 2. DISTANT BACKGROUND MOUNTAINS -->
+  <g fill="#232d3d" opacity="0.7">
+    <polygon points="350,500 420,470 480,485 540,460 610,490 560,520 400,520"/>
+  </g>
+
+  <!-- 3. MAIN ROCKY MOUNTAINS -->
+  <g>
+    <!-- Left Mountain Group -->
+    <path d="M -20,530 Q 30,480 70,590 Q 110,530 150,590 Q 90,620 -20,580 Z" fill="#3a3d35"/>
+    <path d="M 0,560 L 35,500 L 45,520 L 65,475 L 85,535 L 115,505 L 145,590 Z" fill="#b0aa8f"/>
+    <path d="M 45,520 L 65,475 L 85,535 L 65,590 Z" fill="#5e5f52"/>
+
+    <!-- Center-Left Rocky Peaks -->
+    <path d="M 220,520 Q 280,450 330,550 Q 380,440 430,530 Q 320,570 220,520 Z" fill="#8c8770"/>
+    <path d="M 270,510 L 305,445 L 320,470 L 340,425 L 365,500 L 400,550 Z" fill="#d0c8ab"/>
+    <path d="M 305,445 L 340,425 L 325,510 Z" fill="#525447"/>
+
+    <!-- Right Major Mountain Massif -->
+    <path d="M 580,560 Q 660,470 720,510 Q 780,430 840,415 L 880,440 L 920,410 L 950,450 L 1020,550 Z" fill="#7a745d"/>
+    <!-- Rocky Ridges & Facets (Right Peak) -->
+    <path d="M 780,430 L 840,415 L 830,460 L 860,450 L 880,440 L 895,470 L 920,410 L 945,465 L 970,440 L 1000,530 Z" fill="#d9d2b2"/>
+    <path d="M 840,415 L 865,485 L 830,520 L 780,430 Z" fill="#5c5c4c"/>
+    <path d="M 920,410 L 945,465 L 910,510 Z" fill="#4d4f40"/>
+  </g>
+
+  <!-- 4. MID-GROUND ROLLING HILLS -->
+  <g fill="url(#hillMid)">
+    <path d="M -50,600 Q 150,540 380,580 Q 560,530 750,580 Q 900,550 1050,610 L 1050,700 L -50,700 Z"/>
+  </g>
+
+  <!-- Wildflowers - Midground Layer (Abstracted clusters) -->
+  <g fill="#e8dfcb" opacity="0.7">
+    <circle cx="390" cy="580" r="1.5"/><circle cx="410" cy="578" r="1.2"/><circle cx="430" cy="585" r="1.5"/>
+    <circle cx="610" cy="575" r="1.5"/><circle cx="635" cy="572" r="1.2"/><circle cx="660" cy="580" r="1.5"/>
+  </g>
+  <g fill="#d95338" opacity="0.8">
+    <circle cx="400" cy="582" r="1"/><circle cx="420" cy="580" r="1.2"/><circle cx="620" cy="576" r="1"/>
+  </g>
+
+  <!-- 5. FOREGROUND ROLLING HILLS (Dark silhouettes with texture simulation) -->
+  <g fill="url(#hillFront)">
+    <!-- Left Foreground Mound -->
+    <path d="M -50,630 Q 150,550 350,640 Q 500,680 650,630 Q 820,570 1050,630 L 1050,750 L -50,750 Z"/>
+  </g>
+
+  <!-- 6. FOREGROUND WILDFLOWERS & GRASS DETAILS -->
+  <!-- White Daisies / Bright Spots -->
+  <g fill="#f2ede4">
+    <!-- Left Slope Field -->
+    <circle cx="35" cy="635" r="2.5"/><circle cx="45" cy="630" r="2"/><circle cx="55" cy="642" r="2.5"/><circle cx="80" cy="625" r="2"/>
+    <circle cx="95" cy="635" r="2.5"/><circle cx="120" cy="620" r="3"/><circle cx="140" cy="632" r="2"/><circle cx="170" cy="615" r="2.5"/>
+    <circle cx="210" cy="625" r="2"/><circle cx="230" cy="635" r="3"/><circle cx="260" cy="620" r="2.5"/><circle cx="290" cy="630" r="2"/>
+
+    <!-- Center Valley Field -->
+    <path d="M 370,640 c 3,-2 6,1 8,-1 c 2,2 5,0 7,2" stroke="#f2ede4" stroke-width="1.5" fill="none"/>
+    <circle cx="380" cy="645" r="2"/><circle cx="400" cy="652" r="2.5"/><circle cx="425" cy="648" r="2"/>
+    <circle cx="450" cy="660" r="2.5"/><circle cx="480" cy="655" r="2"/><circle cx="510" cy="665" r="2.5"/>
+
+    <!-- Right Foreground Field -->
+    <circle cx="750" cy="650" r="2.5"/><circle cx="770" cy="642" r="2"/><circle cx="795" cy="655" r="3"/>
+    <circle cx="820" cy="645" r="2"/><circle cx="850" cy="652" r="2.5"/><circle cx="880" cy="640" r="2.5"/>
+    <circle cx="910" cy="650" r="2"/><circle cx="940" cy="642" r="3"/><circle cx="970" cy="655" r="2.5"/>
+  </g>
+
+  <!-- Orange/Red Poppy Dots -->
+  <g fill="#cc4125">
+    <circle cx="48" cy="636" r="1.5"/><circle cx="98" cy="637" r="1.5"/><circle cx="143" cy="634" r="1.5"/>
+    <circle cx="233" cy="637" r="1.5"/><circle cx="403" cy="654" r="1.5"/><circle cx="483" cy="657" r="1.5"/>
+    <circle cx="798" cy="657" r="1.5"/><circle cx="853" cy="654" r="1.5"/><circle cx="943" cy="644" r="1.5"/>
+  </g>
+</svg>
