@@ -7,7 +7,7 @@ import { usePoll } from "@/lib/use-poll";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/switch";
+import { Skeleton, Switch } from "@/components/ui/switch";
 import { formatNaira, timeAgo, dueIn, cn } from "@/lib/utils";
 import { receiptStatus, assignedActor, itemLine, phoneLabel } from "@/lib/order-labels";
 import type { DashboardData, OrderSummary } from "@/lib/api/dashboard";
@@ -542,28 +542,14 @@ function QuickActions({ wallet, onWalletChange, onMaintenance }: { wallet: Dashb
               <p className="text-[14px] font-medium text-ink-text">Accepting orders</p>
               <p className="text-[12px] text-ink-faint">Pause the catalog while you restock</p>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={accepting}
-              aria-label="Accepting orders"
-              disabled={saving}
-              onClick={() => void toggleAccepting(!accepting)}
-              className="flex min-h-[44px] items-center justify-center rounded-[10px] px-1.5 transition-colors hover:bg-panel-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua"
-            >
-              <span
-                aria-hidden
-                className={`relative inline-flex h-[26px] w-11 shrink-0 items-center rounded-full border transition-colors ${
-                  accepting ? "border-aqua bg-aqua" : "border-line-strong bg-panel-3"
-                }`}
-              >
-                <span
-                  className={`block h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-                    accepting ? "translate-x-5" : "translate-x-[3px]"
-                  }`}
-                />
-              </span>
-            </button>
+            <label className="flex min-h-[44px] cursor-pointer items-center">
+              <Switch
+                checked={accepting}
+                onCheckedChange={(c) => void toggleAccepting(c)}
+                disabled={saving}
+                aria-label="Accepting orders"
+              />
+            </label>
           </div>
           <div className="flex items-center justify-between gap-3 py-3.5">
             <div>
