@@ -137,6 +137,8 @@ const FAQS = [
   },
 ];
 
+const DEMO_HREF = process.env.EXPORT_STATIC ? "https://github.com/Kohap/zippydesk" : "/dashboard";
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-clip bg-ink">
@@ -163,7 +165,7 @@ export default function LandingPage() {
             </a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/dashboard" className="assist-focus hidden rounded-[10px] md:block">
+            <a href={DEMO_HREF} className="assist-focus hidden rounded-[10px] md:block">
               <Button size="md" className="h-[46px]">
                 Open the live demo
               </Button>
@@ -502,7 +504,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-[52px] rounded-[12px] px-7 text-[16px]">
-                <a href="/dashboard">
+                <a href={DEMO_HREF}>
                   Open the live demo <ChevronRight className="h-4 w-4" aria-hidden />
                 </a>
               </Button>
@@ -535,13 +537,13 @@ export default function LandingPage() {
               <li><a href="#pricing" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Pricing</a></li>
               <li><a href="#faq" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">FAQ</a></li>
               <li><a href="#access" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Get access</a></li>
-              <li><a href="/dashboard" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Live demo</a></li>
+              <li><a href={DEMO_HREF} className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Live demo</a></li>
             </ul>
           </nav>
           <div>
             <p className="label-caps">Payments & trust</p>
             <ul className="mt-4 flex flex-col gap-1 text-[14px]">
-              <li><a href="/dashboard" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Run the demo</a></li>
+              <li><a href={DEMO_HREF} className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Run the demo</a></li>
               <li><a href="#pricing" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Pricing calculator</a></li>
               <li><a href="#access" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Talk to onboarding</a></li>
               <li><a href="/terms" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Terms</a></li>
