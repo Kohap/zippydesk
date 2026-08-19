@@ -65,7 +65,7 @@ export function Overview({ initial }: { initial: DashboardData }) {
       </div>
 
       {lowBalance ? (
-        <div className="flex flex-col gap-3 rounded-[12px] border border-[rgba(242,180,76,0.35)] bg-[rgba(242,180,76,0.08)] p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-[12px] border border-warn-line bg-warn-soft p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-warn" aria-hidden />
             <div>

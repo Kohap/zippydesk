@@ -214,7 +214,10 @@ export default function LandingPage() {
                 <a href="#how">See how it works</a>
               </Button>
             </div>
-            <dl className="intro-rise mx-auto mt-12 flex max-w-lg flex-wrap items-center justify-center divide-x divide-line" style={{ animationDelay: "360ms" }}>
+            <dl
+              className="intro-rise mx-auto mt-12 grid max-w-lg grid-cols-2 items-center justify-items-center gap-y-6 sm:flex sm:flex-wrap sm:justify-center sm:divide-x sm:divide-line"
+              style={{ animationDelay: "360ms" }}
+            >
               <div className="px-4 text-center sm:px-5">
                 <dt className="label-caps">Receipt validated</dt>
                 <dd className="money mt-1.5 text-[22px] font-semibold text-ink-text">2.4s avg</dd>
@@ -247,7 +250,7 @@ export default function LandingPage() {
                       <span className="pulse-ring absolute inline-flex h-full w-full rounded-full bg-aqua" aria-hidden />
                       <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-aqua-bright" aria-hidden />
                     </span>
-                    polling 5s
+                    sample stream
                   </span>
                 </div>
                 <div className="divide-y divide-line">
@@ -272,7 +275,7 @@ export default function LandingPage() {
               </div>
             </div>
             <p className="mt-5 text-center text-[12px] text-ink-faint">
-              Receipts verified by vision AI, approvals routed owner-first, both running right now.
+              Receipts verified by vision AI, approvals routed owner-first. Sample data from the live demo.
             </p>
           </div>
         </section>
@@ -370,7 +373,7 @@ export default function LandingPage() {
                         <span className="pulse-ring absolute inline-flex h-full w-full rounded-full bg-aqua" aria-hidden />
                         <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-aqua-bright" aria-hidden />
                       </span>
-                      posting
+                      sample
                     </span>
                   </div>
                   <div className="divide-y divide-line">

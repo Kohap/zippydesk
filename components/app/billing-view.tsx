@@ -280,8 +280,8 @@ function FuelTankCard({ wallet, onTopUp, onResume }: { wallet: WalletState; onTo
                   <Fuel className="h-4 w-4 text-white" aria-hidden />
                 </span>
                 <div>
-                  <p className="text-[13px] font-medium text-white/85">Wallet balance</p>
-                  <p className="text-[12px] text-white/70">
+                  <p className="text-[13px] font-medium text-white/95">Wallet balance</p>
+                  <p className="text-[12px] text-white/85">
                     Each verified payment deducts one credit at{" "}
                     <span className="money font-medium text-white">{formatNaira(wallet.unitKobo)}</span>
                   </p>
@@ -294,9 +294,9 @@ function FuelTankCard({ wallet, onTopUp, onResume }: { wallet: WalletState; onTo
                 >
                   {wallet.balanceCredits}
                 </span>
-                <span className="text-[14px] text-white/75">credits available</span>
+                <span className="text-[14px] text-white/90">credits available</span>
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/70">
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/85">
                 <Badge variant="neutral" className="border-white/25 bg-white/10 text-[11px] text-white">
                   {TIER_LABEL[wallet.tier]}
                 </Badge>
@@ -315,10 +315,10 @@ function FuelTankCard({ wallet, onTopUp, onResume }: { wallet: WalletState; onTo
               <Button size="md" className="h-11 bg-white text-ocean hover:bg-white/90" onClick={onTopUp}>
                 Top up credits
               </Button>
-              <p aria-hidden className="flex items-center gap-1.5 self-end text-[12px] text-white/70">
+              <p aria-hidden className="flex items-center gap-1.5 self-end text-[12px] text-white/85">
                 {wallet.balanceCredits > 0 ? (
                   <>
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/85" /> live
+                    <span className="h-1.5 w-1.5 rounded-full bg-white" /> live
                   </>
                 ) : (
                   <>

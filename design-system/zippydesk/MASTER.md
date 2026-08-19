@@ -8,6 +8,7 @@
 
 **Project:** zippyDesk
 **Generated:** 2026-08-19 18:06:44
+**Regenerated:** 2026-08-19 (design review — palette synced to shipped code)
 **Category:** Fintech/Crypto
 **Design Dials:** Variance 5/10 (Balanced / Modern) | Motion 6/10 (Standard) | Density 7/10 (Standard)
 
@@ -19,35 +20,36 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#F59E0B` | `--color-primary` |
-| On Primary | `#0F172A` | `--color-on-primary` |
-| Secondary | `#FBBF24` | `--color-secondary` |
-| On Secondary | `#0F172A` | `--color-on-secondary` |
-| Accent/CTA | `#8B5CF6` | `--color-accent` |
-| On Accent/CTA | `#000000` | `--color-on-accent` |
-| Background | `#0F172A` | `--color-background` |
-| Foreground | `#F8FAFC` | `--color-foreground` |
-| Card | `#222735` | `--color-card` |
-| Card Foreground | `#F8FAFC` | `--color-card-foreground` |
-| Muted | `#272F42` | `--color-muted` |
-| Muted Foreground | `#94A3B8` | `--color-muted-foreground` |
-| Border | `#334155` | `--color-border` |
-| Destructive | `#EF4444` | `--color-destructive` |
-| On Destructive | `#000000` | `--color-on-destructive` |
-| Ring | `#F59E0B` | `--color-ring` |
+| Ink (bg) | `#0a0e15` | `--color-ink` |
+| Panel | `#10161f` | `--color-panel` |
+| Panel 2 | `#151d28` | `--color-panel-2` |
+| Panel 3 | `#1c2634` | `--color-panel-3` |
+| Line | `rgba(153,168,186,.1)` | `--color-line` |
+| Line strong | `rgba(153,168,186,.18)` | `--color-line-strong` |
+| Text | `#f1f5f9` | `--color-ink-text` |
+| Muted text | `#9fb0c1` | `--color-ink-muted` |
+| Faint text (warns: ≥4.5:1) | `#7d8fa3` | `--color-ink-faint` |
+| Brand / primary | `#00799c` | `--color-ocean` |
+| Brand accent | `#00bfa6` | `--color-aqua` |
+| Bright accent | `#37e2c6` | `--color-aqua-bright` |
+| Success | `#3ecf97` | `--color-good` |
+| Warning | `#f2b44c` | `--color-warn` |
+| Destructive | `#f0565b` | `--color-bad` |
+| Info | `#4da5e4` | `--color-info` |
 
-**Color Notes:** Gold trust + purple tech
+**Color Notes:** Deep ocean → aqua gradient on night ink. One hue family only; no gold/purple. Brand bands use `gradient-brand` (`#005f85 → #00799c → #00bfa6`).
 
 ### Typography
 
 - **Heading Font:** IBM Plex Sans
 - **Body Font:** IBM Plex Sans
+- **Data/Mono Font:** IBM Plex Mono — financial numerals, order IDs, references, timestamps (`.data` / `.money` classes, tabular-nums)
 - **Mood:** financial, trustworthy, professional, corporate, banking, serious
-- **Google Fonts:** [IBM Plex Sans + IBM Plex Sans](https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap)
+- **Google Fonts:** [IBM Plex Sans + IBM Plex Mono](https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap)
 
-**CSS Import:**
+**CSS Import (FIRST line of globals.css):**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 ```
 
 ### Spacing Variables
@@ -80,68 +82,63 @@
 ### Buttons
 
 ```css
-/* Primary Button */
+/* Primary Button — .btn-brand */
 .btn-primary {
-  background: #8B5CF6;
-  color: white;
-  padding: 12px 24px;
+  background-image: linear-gradient(135deg, #0085ab 0%, #00bfa6 100%);
+  color: #ffffff;
   border-radius: 8px;
   font-weight: 600;
-  transition: all 200ms ease;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.12) inset, 0 8px 20px -12px rgba(0, 191, 166, 0.55);
+  transition: background 150ms ease;
   cursor: pointer;
 }
+.btn-primary:hover { background-image: linear-gradient(135deg, #0090ba 0%, #12cdb1 100%); }
+.btn-primary:active { background-image: linear-gradient(135deg, #006f92 0%, #00a88f 100%); box-shadow: none; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Secondary Button */
+/* Secondary Button — .btn-ghost */
 .btn-secondary {
   background: transparent;
-  color: #F59E0B;
-  border: 2px solid #F59E0B;
-  padding: 12px 24px;
+  color: #f1f5f9;
+  border: 1px solid rgba(153, 168, 186, 0.18);
   border-radius: 8px;
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: background 150ms ease;
   cursor: pointer;
 }
+.btn-secondary:hover { background: #151d28; }
+.btn-secondary:active { background: #1c2634; }
+.btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 ```
 
 ### Cards
 
 ```css
 .card {
-  background: #0F172A;
+  background: linear-gradient(180deg, #10161f 0%, color-mix(in srgb, #10161f 92%, #0a0e15) 100%);
+  border: 1px solid rgba(153, 168, 186, 0.1);
   border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
-  cursor: pointer;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.02) inset, 0 10px 24px -18px rgba(0, 0, 0, 0.8);
 }
-
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
+/* Elevated: balance/hero surfaces -> .card-elevated (panel-2 gradient, stronger shadow) */
+/* Brand band: balance heroes -> .brand-band (ocean->aqua gradient, surface-grid texture) */
 ```
 
 ### Inputs
 
 ```css
 .input {
-  padding: 12px 16px;
-  border: 1px solid #E2E8F0;
+  background: #10161f;
+  border: 1px solid rgba(153, 168, 186, 0.18);
   border-radius: 8px;
-  font-size: 16px;
+  color: #f1f5f9;
   transition: border-color 200ms ease;
 }
 
-.input:focus {
-  border-color: #F59E0B;
-  outline: none;
-  box-shadow: 0 0 0 3px #F59E0B20;
+.input:focus-visible {
+  border-color: #00bfa6;
+  outline: 2px solid #00bfa6;
+  outline-offset: 2px;
 }
 ```
 
@@ -205,7 +202,7 @@ gsap.from('.grid-item', { opacity: 0, scale: 0.92, y: 16, duration: 0.4, stagger
 
 - ❌ Playful design
 - ❌ Unclear fees
-- ❌ AI purple/pink gradients
+- ❌ AI purple/pink gradients (ocean→aqua is the only allowed accent gradient)
 
 ### Additional Forbidden Patterns
 
@@ -223,11 +220,11 @@ gsap.from('.grid-item', { opacity: 0, scale: 0.92, y: 16, duration: 0.4, stagger
 Before delivering any UI code, verify:
 
 - [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
+- [ ] All icons from consistent icon set (Lucide)
 - [ ] `cursor-pointer` on all clickable elements
 - [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
+- [ ] Dark mode only: text contrast 4.5:1 minimum (ink-faint ≥ 4.5:1 on ink)
+- [ ] Focus states visible for keyboard navigation (`:focus-visible` outline, aqua)
 - [ ] `prefers-reduced-motion` respected
 - [ ] Responsive: 375px, 768px, 1024px, 1440px
 - [ ] No content hidden behind fixed navbars

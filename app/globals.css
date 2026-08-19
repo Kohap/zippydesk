@@ -13,7 +13,7 @@
   /* Text */
   --color-ink-text: #f1f5f9;
   --color-ink-muted: #9fb0c1;
-  --color-ink-faint: #5e6f80;
+  --color-ink-faint: #7d8fa3;
 
   /* Brand: deep ocean to aqua (user-specified) */
   --color-ocean: #00799c;
@@ -103,13 +103,6 @@ body {
 
 .gradient-brand {
   background-image: linear-gradient(135deg, var(--color-ocean) 0%, var(--color-aqua) 100%);
-}
-
-.gradient-text {
-  background-image: linear-gradient(90deg, #19a8cf 0%, var(--color-aqua-bright) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 /* Primary action: single filled brand button, crisp edge, quiet glow. */
