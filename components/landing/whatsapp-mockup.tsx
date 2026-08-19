@@ -48,7 +48,7 @@ export function WhatsAppMockup() {
         </div>
 
         {/* Conversation */}
-        <div className="flex min-h-[300px] flex-col gap-3 bg-[#0c1216] p-4">
+        <div className="flex min-h-[300px] flex-col gap-3 bg-ink p-4">
           <Bubble side="left" delay={0}>
             Hi! I want to order the <span className="font-medium text-ink-text">House special 2L</span> please.
           </Bubble>
@@ -127,7 +127,7 @@ function Bubble({
           side === "right" ? "rounded-br-sm" : "rounded-bl-sm",
           tone === "brand" && "bg-aqua/15 text-ink-text border border-aqua/30",
           tone === "good" && "bg-good/15 text-ink-text border border-good/30",
-          tone === "default" && side === "right" && "bg-[#1a3940] text-ink-text",
+          tone === "default" && side === "right" && "bg-panel-3 text-ink-text",
           tone === "default" && side === "left" && "bg-panel-3 text-ink-text",
         )}
       >
@@ -143,7 +143,7 @@ function ReceiptBubble({ delay }: { delay: number }) {
       className="bubble-in flex justify-end"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex max-w-[85%] flex-col gap-2 rounded-[14px] rounded-br-sm border border-line bg-[#1a3940] px-3 py-2.5 text-ink-text">
+      <div className="flex max-w-[85%] flex-col gap-2 rounded-[14px] rounded-br-sm border border-line bg-panel-3 px-3 py-2.5 text-ink-text">
         <div className="flex items-center gap-2 text-[11px] font-medium text-ink-muted">
           <Receipt className="h-3.5 w-3.5" aria-hidden />
           <span>IMG_2841.jpg</span>
@@ -153,12 +153,12 @@ function ReceiptBubble({ delay }: { delay: number }) {
             <svg viewBox="0 0 200 150" className="h-full w-full" aria-hidden>
               <defs>
                 <linearGradient id="rcpt-bg" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#1a2229" />
-                  <stop offset="1" stopColor="#0f1418" />
+                  <stop offset="0" stopColor="#1c2634" />
+                  <stop offset="1" stopColor="#10161f" />
                 </linearGradient>
                 <linearGradient id="rcpt-accent" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stopColor="#006b8c" />
-                  <stop offset="1" stopColor="#00bca3" />
+                  <stop offset="0" stopColor="var(--color-ocean)" />
+                  <stop offset="1" stopColor="var(--color-aqua)" />
                 </linearGradient>
               </defs>
               <rect width="200" height="150" fill="url(#rcpt-bg)" />

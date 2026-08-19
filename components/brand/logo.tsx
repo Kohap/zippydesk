@@ -10,8 +10,8 @@ export function BoltMark({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="zd-bolt" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#0083a8" />
-          <stop offset="1" stopColor="#00bca3" />
+          <stop offset="0" stopColor="var(--color-ocean)" />
+          <stop offset="1" stopColor="var(--color-aqua)" />
         </linearGradient>
       </defs>
       <path fill="url(#zd-bolt)" d="M17.9 2 6.2 18h6.9l-2.9 12L22.4 13h-7z" />
