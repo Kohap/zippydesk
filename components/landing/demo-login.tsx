@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
 
 export function DemoLogin({ children, className }: { children: ReactNode; className?: string }) {
@@ -17,8 +16,8 @@ export function DemoLogin({ children, className }: { children: ReactNode; classN
     router.refresh();
   }
   return (
-    <a className={cn(buttonVariants({ size: "md" }), className)} role="button" tabIndex={0} onClick={() => void enter()} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); void enter(); } }}>
+    <Button size="md" className={className} onClick={() => void enter()}>
       {children}
-    </a>
+    </Button>
   );
 }
