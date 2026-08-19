@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { ArrowRight, CheckCircle2, ScanText, Timer, ShieldCheck, Package, ChevronRight } from "lucide-react";
+import { ArrowRight, ArrowDownToLine, CheckCircle2, ScanText, Timer, ShieldCheck, Package, ChevronRight } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { PricingCalculator } from "@/components/landing/pricing-calculator";
 import { LeadForm } from "@/components/landing/lead-form";
 import { FAQ } from "@/components/landing/faq";
@@ -37,6 +38,39 @@ const QUEUE_ROWS = [
   { order: "GFT-A3-1002", amount: "N10,000", status: "Receipt verified in 2.4s", actor: "Owner notified", when: "0m" },
   { order: "GFT-A3-1003", amount: "N6,500", status: "Waiting on owner", actor: "Owner", when: "3m" },
   { order: "GFT-A3-1004", amount: "N5,000", status: "Escalated to assistant", actor: "Assistant", when: "5m" },
+];
+
+const PIPELINE = [
+  {
+    title: "Top up once, book for weeks",
+    copy: "Paystack card, bank transfer, or virtual account. Credits land on the ledger instantly and never expire — resets only on top-up.",
+  },
+  {
+    title: "Every receipt is verified, not trusted",
+    copy: "Vision AI reads the image, arithmetic cross-checks the narration against the order's amount, and only a match deducts a credit.",
+  },
+  {
+    title: "One credit, one verified payment",
+    copy: "Unit pricing follows your tier — the higher the tier, the cheaper each verification. The calculator shows the exact daily cost.",
+  },
+  {
+    title: "Auto-recharge or lockout — never silent loss",
+    copy: "Cross your floor and the wallet tops itself up. At zero, new orders pause with every message preserved. Nothing drains downstream.",
+  },
+];
+
+const LEDGER_ROWS = [
+  { id: "ledger-1", event: "TOPUP_BOOKED", ref: "pyk_ref_7f2a1c · card", tone: "in" as const, delta: "+500", after: "500" },
+  { id: "ledger-2", event: "PAYMENT_VERIFIED", ref: "GFT-A3-1001", tone: "out" as const, delta: "−1", after: "499" },
+  { id: "ledger-3", event: "TOPUP_BOOKED", ref: "pyk_ref_9b41d8 · transfer", tone: "in" as const, delta: "+250", after: "749" },
+  { id: "ledger-4", event: "PAYMENT_VERIFIED", ref: "GFT-A3-1002", tone: "out" as const, delta: "−1", after: "748" },
+  { id: "ledger-5", event: "ZERO_BALANCE_LOCKOUT", ref: "orders paused · messages kept", tone: "lock" as const, delta: "0", after: "0" },
+];
+
+const SAFEGUARDS = [
+  { icon: ShieldCheck, title: "No custody", copy: "Customer funds never sit in zippyDesk. Transfers run between their bank and yours." },
+  { icon: Timer, title: "5-min ladder", copy: "Owner first, assistant second, re-alerts daily — a verified payment never waits silently." },
+  { icon: Package, title: "Failed capacity", copy: "Stock full? Refunds route back through the same ledger with full trace IDs." },
 ];
 
 const TRUST_LINES = [
@@ -115,6 +149,9 @@ export default function LandingPage() {
             <a href="#how" className="flex items-center py-3 text-[14px] leading-6 text-ink-muted transition-colors hover:text-ink-text">
               How it works
             </a>
+            <a href="#payments" className="flex items-center py-3 text-[14px] leading-6 text-ink-muted transition-colors hover:text-ink-text">
+              Payments
+            </a>
             <a href="#pricing" className="flex items-center py-3 text-[14px] leading-6 text-ink-muted transition-colors hover:text-ink-text">
               Pricing
             </a>
@@ -144,7 +181,7 @@ export default function LandingPage() {
             <div className="glow-drift absolute -top-10 right-1/4 h-64 w-64 rounded-full bg-aqua/25 blur-3xl" style={{ animationDelay: "4s" }} />
           </div>
           <div className="mx-auto max-w-3xl text-center">
-            <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="intro-rise flex flex-wrap items-center justify-center gap-2">
               {TRUST_BADGES.map((b) => (
                 <span
                   key={b.k}
@@ -156,18 +193,18 @@ export default function LandingPage() {
                 </span>
               ))}
             </div>
-            <h1 className="mt-7 text-[32px] font-semibold leading-[1.1] tracking-tight text-ink-text sm:text-[44px] md:text-[56px]">
+            <h1 className="intro-rise mt-7 text-[32px] font-semibold leading-[1.1] tracking-tight text-ink-text sm:text-[44px] md:text-[56px]" style={{ animationDelay: "90ms" }}>
               Your customers can see you are online.
               <br className="hidden sm:block" />
               <span className="text-ink-muted">Why are you making them wait?</span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-ink-muted md:text-[17px]">
+            <p className="intro-rise mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-ink-muted md:text-[17px]" style={{ animationDelay: "180ms" }}>
               Every minute a paid order sits in your inbox, the success penalty compounds — that
               customer is already telling someone how slow you are. zippyDesk answers, validates,
               confirms and refunds in real time, so one shop can serve an infinite queue of
               conversations at once.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="intro-rise mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row" style={{ animationDelay: "270ms" }}>
               <Button asChild size="lg" className="h-[52px] rounded-[12px] px-7 text-[16px]">
                 <a href="#access">
                   Start free <ArrowRight className="h-4 w-4" aria-hidden />
@@ -177,7 +214,7 @@ export default function LandingPage() {
                 <a href="#how">See how it works</a>
               </Button>
             </div>
-            <dl className="mx-auto mt-12 flex max-w-lg flex-wrap items-center justify-center divide-x divide-line">
+            <dl className="intro-rise mx-auto mt-12 flex max-w-lg flex-wrap items-center justify-center divide-x divide-line" style={{ animationDelay: "360ms" }}>
               <div className="px-4 text-center sm:px-5">
                 <dt className="label-caps">Receipt validated</dt>
                 <dd className="money mt-1.5 text-[22px] font-semibold text-ink-text">2.4s avg</dd>
@@ -296,6 +333,91 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <section id="payments" className="scroll-mt-20 border-t border-line bg-gradient-to-b from-ink via-panel/60 to-ink">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
+            <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+              <div className="lg:sticky lg:top-24">
+                <p className="label-caps">Payments & ledger</p>
+                <h2 className="mt-3 text-[24px] font-semibold tracking-tight text-ink-text sm:text-[34px]">
+                  A wallet your shop can't outrun
+                </h2>
+                <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-muted">
+                  Every confirmed payment moves through the same pipeline: verified against the
+                  narration, applied to the right order, and burned from prepaid credits. No floats,
+                  no IOUs — just a ledger that reconciles itself.
+                </p>
+                <ol className="mt-8 flex flex-col gap-6">
+                  {PIPELINE.map((step, i) => (
+                    <li key={step.title} className="flex gap-4">
+                      <span aria-hidden className="money flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-aqua/30 bg-[rgba(0,191,166,0.08)] text-[13px] font-semibold text-aqua-bright">
+                        0{i + 1}
+                      </span>
+                      <div>
+                        <p className="text-[15px] font-medium text-ink-text">{step.title}</p>
+                        <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{step.copy}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <div className="card overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-line bg-panel-2 px-5 py-3">
+                    <p className="text-[13px] font-medium text-ink-muted">Ledger — wallet events</p>
+                    <span className="inline-flex items-center gap-1.5 rounded-[6px] border border-aqua-line bg-aqua-soft px-2 py-[3px] text-[12px] font-medium text-aqua-text">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="pulse-ring absolute inline-flex h-full w-full rounded-full bg-aqua" aria-hidden />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-aqua-bright" aria-hidden />
+                      </span>
+                      posting
+                    </span>
+                  </div>
+                  <div className="divide-y divide-line">
+                    {LEDGER_ROWS.map((row, i) => (
+                      <div
+                        key={row.id}
+                        className="order-slide-in flex items-center justify-between gap-4 px-5 py-3.5"
+                        style={{ animationDelay: `${i * 160}ms`, opacity: 0 }}
+                      >
+                        <div className="flex min-w-0 items-center gap-3">
+                          {row.tone === "in" ? (
+                            <ArrowDownToLine className="h-4 w-4 shrink-0 text-aqua-bright" aria-hidden />
+                          ) : row.tone === "out" ? (
+                            <ScanText className="h-4 w-4 shrink-0 text-good" aria-hidden />
+                          ) : (
+                            <ShieldCheck className="h-4 w-4 shrink-0 text-warn" aria-hidden />
+                          )}
+                          <div className="min-w-0">
+                            <p className="money truncate text-[13px] font-medium text-ink-text">{row.event}</p>
+                            <p className="money truncate text-[12px] text-ink-muted">{row.ref}</p>
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className={cn(row.tone === "in" ? "money text-[13px] font-medium text-aqua-text" : "money text-[13px] text-ink-faint")}>
+                            {row.delta}
+                          </p>
+                          <p className="money text-[12px] text-ink-faint">bal {row.after}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {SAFEGUARDS.map((s) => (
+                    <div key={s.title} className="card flex flex-col gap-1.5 p-4">
+                      <s.icon className="h-4 w-4 text-aqua-bright" aria-hidden />
+                      <p className="text-[13px] font-semibold text-ink-text">{s.title}</p>
+                      <p className="text-[12px] leading-relaxed text-ink-muted">{s.copy}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="pricing" className="scroll-mt-20 border-t border-line bg-panel">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
             <div className="mx-auto max-w-2xl text-center">
@@ -406,6 +528,7 @@ export default function LandingPage() {
             <p className="label-caps">Product</p>
             <ul className="mt-4 flex flex-col gap-1 text-[14px]">
               <li><a href="#how" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">How it works</a></li>
+              <li><a href="#payments" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Payments & ledger</a></li>
               <li><a href="#pricing" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Pricing</a></li>
               <li><a href="#faq" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">FAQ</a></li>
               <li><a href="#access" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Get access</a></li>

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 const SECTIONS: ReadonlyArray<{ href: string; label: string }> = [
   { href: "#how", label: "How it works" },
+  { href: "#payments", label: "Payments" },
   { href: "#pricing", label: "Pricing" },
   { href: "#access", label: "Get access" },
 ];
