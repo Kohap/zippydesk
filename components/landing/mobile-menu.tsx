@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 
 const SECTIONS: ReadonlyArray<{ href: string; label: string }> = [
@@ -45,7 +44,7 @@ export function MobileMenu() {
       <div
         id="zd-mobile-menu"
         className={cn(
-          "fixed inset-x-0 top-16 z-30 origin-top border-b border-line bg-ink/97 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)] backdrop-blur transition-all duration-150",
+          "fixed inset-x-0 top-16 z-30 origin-top border-b border-line bg-ink/97 shadow-lg backdrop-blur transition-all duration-150",
           open ? "scale-y-100 opacity-100" : "pointer-events-none scale-y-95 opacity-0",
         )}
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -67,9 +66,6 @@ export function MobileMenu() {
             </Button>
           </Link>
         </nav>
-      </div>
-      <div className="sr-only" aria-hidden={!open}>
-        <Logo />
       </div>
     </div>
   );
