@@ -14,7 +14,7 @@ export default function AppError({ error, reset }: { error: Error; reset: () => 
       <div className="card flex flex-col items-start gap-4 p-6 md:p-8">
         <span
           aria-hidden
-          className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-[rgba(239,90,95,0.35)] bg-[rgba(239,90,95,0.1)]"
+          className="flex h-11 w-11 items-center justify-center rounded-[8px] border border-bad-line bg-bad-soft"
         >
           <AlertTriangle className="h-5 w-5 text-bad" />
         </span>

@@ -307,7 +307,7 @@ export default function LandingPage() {
                 <div className="flex items-start justify-between">
                   <span
                     aria-hidden
-                    className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-aqua/30 bg-[rgba(0,191,166,0.08)]"
+                    className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-aqua/30 bg-aqua-soft"
                   >
                     <step.icon className="h-5 w-5 text-aqua-bright" />
                   </span>
@@ -323,7 +323,7 @@ export default function LandingPage() {
             <div className="mt-5 grid gap-3 text-[14px] text-ink-muted sm:grid-cols-2">
               {BENEFITS.map((b) => (
                 <div key={b.title} className="flex items-start gap-3 rounded-[12px] border border-line bg-panel p-4 leading-relaxed">
-                  <span aria-hidden className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-aqua/30 bg-[rgba(0,191,166,0.08)]">
+                  <span aria-hidden className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-aqua/30 bg-aqua-soft">
                     <b.icon className="h-4 w-4 text-aqua-bright" />
                   </span>
                   <div>
@@ -352,7 +352,7 @@ export default function LandingPage() {
                 <ol className="mt-8 flex flex-col gap-6">
                   {PIPELINE.map((step, i) => (
                     <li key={step.title} className="flex gap-4">
-                      <span aria-hidden className="money flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-aqua/30 bg-[rgba(0,191,166,0.08)] text-[13px] font-semibold text-aqua-bright">
+                      <span aria-hidden className="money flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-aqua/30 bg-aqua-soft text-[13px] font-semibold text-aqua-bright">
                         0{i + 1}
                       </span>
                       <div>
