@@ -82,7 +82,14 @@ export function Overview({ initial }: { initial: DashboardData }) {
       ) : null}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Kpi index={0} label="Fuel tank" value={String(current.wallet.balanceCredits)} unit="credits" icon={Fuel} tone="brand" sub={lowBalance ? "below floor" : "healthy"} />
+        <WalletStat
+          index={0}
+          balance={current.wallet.balanceCredits}
+          floor={current.wallet.lowThreshold}
+          unit="credits"
+          icon={Fuel}
+          sub={lowBalance ? "below floor" : "healthy"}
+        />
         <Kpi index={1} label="Revenue verified today" value={formatNaira(current.kpis.revenueTodayKobo)} icon={Banknote} tone="text" sub="approved + refunded" />
         <Kpi index={2} label="Orders processed today" value={String(current.kpis.ordersToday)} icon={Clock3} tone="text" sub="across all vendors" />
         <Kpi index={3} label="Avg receipt validation" value={avg} icon={Gauge} tone="text" sub="vision AI latency" />
@@ -144,6 +151,45 @@ export function Overview({ initial }: { initial: DashboardData }) {
   );
 }
 
+function WalletStat({
+  balance,
+  floor,
+  unit,
+  icon: Icon,
+  sub,
+  index = 0,
+}: {
+  balance: number;
+  floor: number;
+  unit: string;
+  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  sub?: string;
+  index?: number;
+}) {
+  const ratio = Math.min(1, balance / (floor * 4));
+  return (
+    <div className="order-slide-in card-elevated flex flex-col gap-2 p-4" style={{ animationDelay: `${index * 90}ms`, opacity: 0 }}>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Icon className="h-4 w-4 text-aqua-bright" aria-hidden />
+          <span className="label-caps">Wallet balance</span>
+        </div>
+        <Link href="/billing" className="assist-focus rounded-[6px] text-[12px] font-medium text-aqua-text transition-colors hover:text-aqua-bright">
+          Top up
+        </Link>
+      </div>
+      <p key={balance} className="count-in money mt-1 text-[26px] font-semibold leading-none text-aqua-bright">
+        {balance}
+        <span className="ml-1.5 text-[13px] font-normal text-ink-faint">{unit}</span>
+      </p>
+      <div aria-hidden className="mt-1 h-1 w-full overflow-hidden rounded-full bg-panel-3">
+        <div className="h-full rounded-full bg-gradient-to-r from-ocean to-aqua" style={{ width: `${ratio * 100}%` }} />
+      </div>
+      <p className="text-[12px] text-ink-faint">{sub} · floor {floor}</p>
+    </div>
+  );
+}
+
 function Kpi({
   label,
   value,
@@ -173,7 +219,7 @@ function Kpi({
       <p
         key={value}
         className={cn(
-          "count-in data mt-1 text-[24px] font-semibold leading-none",
+          "count-in money mt-1 text-[24px] font-semibold leading-none",
           tone === "brand" ? "text-aqua-bright" : "text-ink-text",
         )}
       >

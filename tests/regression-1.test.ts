@@ -60,7 +60,7 @@ const ctx = { meta: { db: "postgres" } } as AppContext;
 
 describe("topUpWallet postgres path", () => {
   it("returns the post-mutation balance, not the pre-commit read", async () => {
-    const wallet = await topUpWallet(ctx, "merchant-parfait", 100);
+    const wallet = await topUpWallet(ctx, "merchant-parfait", 100, "card", null);
     expect(wallet).not.toBeNull();
     expect(wallet?.balanceCredits).toBe(200);
   });

@@ -86,10 +86,13 @@ export function AppShell({
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-11 items-center gap-3 rounded-[10px] px-3 text-[14px] font-medium transition-colors duration-100",
+                  "relative flex h-11 items-center gap-3 rounded-[10px] px-3 text-[14px] font-medium transition-colors duration-100",
                   active ? "bg-panel-2 text-ink-text" : "text-ink-muted hover:bg-panel-2/60 hover:text-ink-text",
                 )}
               >
+                {active ? (
+                  <span aria-hidden className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-aqua-bright" />
+                ) : null}
                 <item.icon className={cn("h-[18px] w-[18px]", active ? "text-aqua-bright" : "text-ink-faint")} aria-hidden />
                 {item.label}
               </Link>
@@ -97,23 +100,9 @@ export function AppShell({
           })}
         </nav>
         <div className="flex flex-col gap-3 border-t border-line p-4">
-          <div className="flex items-center gap-2">
-            {META_DOTS.map((d) => (
-              <span
-                key={d.key}
-                title={`${d.key}: ${health?.meta?.[d.key as keyof NonNullable<HealthMeta["meta"]>] ?? "..."}`}
-                className={cn("h-1.5 w-1.5 rounded-full", health?.meta ? "bg-good" : "bg-ink-faint")}
-              />
-            ))}
-            <span className="data ml-1 truncate text-[11px] text-ink-faint">
-              {health?.meta
-                ? `${health.meta.db} - ${health.meta.vision} - ${health.meta.scheduler}`
-                : "connecting"}
-            </span>
-          </div>
           <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2.5">
-              <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-panel-3 text-[13px] font-semibold text-aqua-bright">
+              <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-ocean to-aqua text-[13px] font-semibold text-white">
                 {merchant.name.slice(0, 1)}
               </span>
               <div className="min-w-0">
@@ -135,6 +124,20 @@ export function AppShell({
                 ))}
               </select>
             ) : null}
+          </div>
+          <div className="flex items-center gap-2">
+            {META_DOTS.map((d) => (
+              <span
+                key={d.key}
+                title={`${d.key}: ${health?.meta?.[d.key as keyof NonNullable<HealthMeta["meta"]>] ?? "..."}`}
+                className={cn("h-1.5 w-1.5 rounded-full", health?.meta ? "bg-good" : "bg-ink-faint")}
+              />
+            ))}
+            <span className="data ml-1 truncate text-[11px] text-ink-faint">
+              {health?.meta
+                ? `${health.meta.db} - ${health.meta.vision} - ${health.meta.scheduler}`
+                : "connecting"}
+            </span>
           </div>
         </div>
       </aside>

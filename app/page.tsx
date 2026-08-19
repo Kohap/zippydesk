@@ -33,13 +33,6 @@ const STEPS = [
   },
 ];
 
-const HANDLES = [
-  "Receipt validation in seconds, not hours",
-  "5-minute escalation ladder: owner, then assistant, then auto-tracking",
-  "Real-time inventory locking with failed-capacity refunds when stock runs dry",
-  "Prepaid credits that auto-recharge before a rush hour empties the tank",
-];
-
 const QUEUE_ROWS = [
   { order: "GFT-A3-1002", amount: "N10,000", status: "Receipt verified in 2.4s", actor: "Owner notified", when: "0m" },
   { order: "GFT-A3-1003", amount: "N6,500", status: "Waiting on owner", actor: "Owner", when: "3m" },
@@ -47,11 +40,40 @@ const QUEUE_ROWS = [
 ];
 
 const TRUST_LINES = [
-  "Built for WhatsApp Cloud API",
-  "Paystack-secured billing",
+  "PCI-DSS-aligned billing via Paystack",
   "PostgreSQL ledger, audited daily",
+  "Funds never held — transfers stay in your bank",
   "Vision receipt extraction",
   "5-minute owner-then-assistant ladder",
+];
+
+const TRUST_BADGES = [
+  { k: "Ledger", v: "PostgreSQL · daily audit" },
+  { k: "Payments", v: "Paystack-secured rails" },
+  { k: "Wallet", v: "prepaid credits · auto-recharge" },
+];
+
+const BENEFITS = [
+  {
+    icon: ShieldCheck,
+    title: "Prepaid wallet, zero custody",
+    copy: "Top up credits once; every book sits on rails. zippyDesk never holds customer funds — money moves between your customer's bank and yours.",
+  },
+  {
+    icon: Timer,
+    title: "Auto-recharge before the rush",
+    copy: "When the tank crosses your floor, the wallet tops itself up so a Monday-morning rush never hits an empty ledger.",
+  },
+  {
+    icon: ScanText,
+    title: "Every naira reconciled",
+    copy: "Vision reads each receipt, arithmetic checks each balance. The activity feed shows credits coined and burned with full trace IDs.",
+  },
+  {
+    icon: Package,
+    title: "Pause when you restock",
+    copy: "One toggle stops new orders, keeps every message, and resumes exactly where the ledger said you were.",
+  },
 ];
 
 const FAQS = [
@@ -122,7 +144,19 @@ export default function LandingPage() {
             <div className="glow-drift absolute -top-10 right-1/4 h-64 w-64 rounded-full bg-aqua/25 blur-3xl" style={{ animationDelay: "4s" }} />
           </div>
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-[32px] font-semibold leading-[1.1] tracking-tight text-ink-text sm:text-[44px] md:text-[56px]">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {TRUST_BADGES.map((b) => (
+                <span
+                  key={b.k}
+                  className="inline-flex items-center gap-2 rounded-full border border-line bg-panel/80 px-3 py-1.5 text-[12px] text-ink-muted"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-aqua-bright" aria-hidden />
+                  <span className="font-medium text-ink-text">{b.k}</span>
+                  {b.v}
+                </span>
+              ))}
+            </div>
+            <h1 className="mt-7 text-[32px] font-semibold leading-[1.1] tracking-tight text-ink-text sm:text-[44px] md:text-[56px]">
               Your customers can see you are online.
               <br className="hidden sm:block" />
               <span className="text-ink-muted">Why are you making them wait?</span>
@@ -146,19 +180,19 @@ export default function LandingPage() {
             <dl className="mx-auto mt-12 flex max-w-lg flex-wrap items-center justify-center divide-x divide-line">
               <div className="px-4 text-center sm:px-5">
                 <dt className="label-caps">Receipt validated</dt>
-                <dd className="data mt-1.5 text-[22px] font-semibold text-ink-text">2.4s avg</dd>
+                <dd className="money mt-1.5 text-[22px] font-semibold text-ink-text">2.4s avg</dd>
               </div>
               <div className="px-5 text-center">
                 <dt className="label-caps">Approval ladder</dt>
-                <dd className="data mt-1.5 text-[22px] font-semibold text-ink-text">5 min</dd>
+                <dd className="money mt-1.5 text-[22px] font-semibold text-ink-text">5 min</dd>
               </div>
               <div className="px-5 text-center">
                 <dt className="label-caps">Concurrent chats</dt>
-                <dd className="data mt-1.5 text-[22px] font-semibold text-ink-text">Unlimited</dd>
+                <dd className="money mt-1.5 text-[22px] font-semibold text-ink-text">Unlimited</dd>
               </div>
               <div className="px-5 text-center">
-                <dt className="label-caps">Schema validation</dt>
-                <dd className="data mt-1.5 text-[22px] font-semibold text-ink-text">99.2%</dd>
+                <dt className="label-caps">Ledger reconciliation</dt>
+                <dd className="money mt-1.5 text-[22px] font-semibold text-ink-text">99.2%</dd>
               </div>
             </dl>
           </div>
@@ -187,9 +221,9 @@ export default function LandingPage() {
                       style={{ animationDelay: `${300 + i * 180}ms`, opacity: 0 }}
                     >
                       <div className="flex min-w-0 items-center gap-3">
-                        <span className="data hidden text-[13px] text-ink-faint sm:block">{row.when}</span>
-                        <span className="data truncate text-[14px] font-medium text-ink-text">{row.order}</span>
-                        <span className="data hidden text-[14px] text-ink-muted md:block">{row.amount}</span>
+                        <span className="money hidden text-[13px] text-ink-faint sm:block">{row.when}</span>
+                        <span className="money truncate text-[14px] font-medium text-ink-text">{row.order}</span>
+                        <span className="money hidden text-[14px] text-ink-muted md:block">{row.amount}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <Badge variant={row.when === "0m" ? "good" : row.when === "3m" ? "brand" : "warn"}>{row.status}</Badge>
@@ -228,33 +262,45 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="mt-12 grid gap-5 md:grid-cols-3">
-            {STEPS.map((step) => (
+            {STEPS.map((step, i) => (
               <div key={step.title} className="card flex flex-col p-6 md:p-7">
-                <span
-                  aria-hidden
-                  className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-aqua/30 bg-[rgba(0,188,163,0.08)]"
-                >
-                  <step.icon className="h-5 w-5 text-aqua-bright" />
-                </span>
+                <div className="flex items-start justify-between">
+                  <span
+                    aria-hidden
+                    className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-aqua/30 bg-[rgba(0,191,166,0.08)]"
+                  >
+                    <step.icon className="h-5 w-5 text-aqua-bright" />
+                  </span>
+                  <span className="money text-[13px] text-ink-faint">0{i + 1}</span>
+                </div>
                 <h3 className="mt-5 text-[17px] font-semibold text-ink-text">{step.title}</h3>
                 <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{step.copy}</p>
               </div>
             ))}
           </div>
-          <div className="mx-auto mt-12 grid max-w-3xl gap-3 text-[14px] text-ink-muted sm:grid-cols-2">
-            {HANDLES.map((h) => (
-              <p key={h} className="flex items-start gap-2.5 rounded-[10px] border border-line bg-panel px-4 py-3 leading-relaxed">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-aqua-bright" aria-hidden />
-                <span>{h}</span>
-              </p>
-            ))}
+          <div className="mx-auto mt-12 max-w-6xl">
+            <h3 className="label-caps text-center">Built for merchants who take payments seriously</h3>
+            <div className="mt-5 grid gap-3 text-[14px] text-ink-muted sm:grid-cols-2">
+              {BENEFITS.map((b) => (
+                <div key={b.title} className="flex items-start gap-3 rounded-[12px] border border-line bg-panel p-4 leading-relaxed">
+                  <span aria-hidden className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-aqua/30 bg-[rgba(0,191,166,0.08)]">
+                    <b.icon className="h-4 w-4 text-aqua-bright" />
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-medium text-ink-text">{b.title}</p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{b.copy}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
         <section id="pricing" className="scroll-mt-20 border-t border-line bg-panel">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
             <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-[24px] font-semibold tracking-tight text-ink-text sm:text-[34px]">
+              <p className="label-caps">Transparent billing</p>
+              <h2 className="mt-3 text-[24px] font-semibold tracking-tight text-ink-text sm:text-[34px]">
                 A base tier and a wallet that scales with you
               </h2>
               <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
@@ -350,6 +396,11 @@ export default function LandingPage() {
             <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-ink-muted">
               Autonomous WhatsApp commerce for merchants who outgrew the blue tick.
             </p>
+            <ul className="mt-6 flex flex-wrap gap-2 text-[12px]">
+              <li className="rounded-full border border-line px-3 py-1.5 text-ink-faint">PCI-DSS-aligned</li>
+              <li className="rounded-full border border-line px-3 py-1.5 text-ink-faint">PostgreSQL ledger</li>
+              <li className="rounded-full border border-line px-3 py-1.5 text-ink-faint">Paystack rails</li>
+            </ul>
           </div>
           <nav aria-label="Product">
             <p className="label-caps">Product</p>
@@ -362,11 +413,12 @@ export default function LandingPage() {
             </ul>
           </nav>
           <div>
-            <p className="label-caps">Resources</p>
+            <p className="label-caps">Payments & trust</p>
             <ul className="mt-4 flex flex-col gap-1 text-[14px]">
               <li><a href="/dashboard" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Run the demo</a></li>
               <li><a href="#pricing" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Pricing calculator</a></li>
               <li><a href="#access" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Talk to onboarding</a></li>
+              <li><a href="/terms" className="flex min-h-[44px] items-center text-ink-muted transition-colors hover:text-ink-text">Terms</a></li>
             </ul>
           </div>
         </div>

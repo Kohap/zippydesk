@@ -239,7 +239,6 @@ function LowBalanceBanner({ wallet, onTopUp }: { wallet: WalletState; onTopUp: (
 function FuelTankCard({ wallet, onTopUp, onResume }: { wallet: WalletState; onTopUp: () => void; onResume: () => void | Promise<void> }) {
   const max = Math.max(wallet.lowThreshold * 4, 200);
   const pct = Math.min(100, Math.round((wallet.balanceCredits / max) * 100));
-  const tierTier = findTierByBase(wallet.baseMonthly);
   const [accepting, setAccepting] = React.useState(wallet.acceptingOrders);
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
@@ -269,67 +268,71 @@ function FuelTankCard({ wallet, onTopUp, onResume }: { wallet: WalletState; onTo
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardContent className="p-0">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-aqua/30 bg-aqua-soft">
-              <Fuel className="h-4 w-4 text-aqua-bright" aria-hidden />
-            </span>
+        {/* Balance hero band */}
+        <div className="brand-band relative px-5 py-6 md:px-6">
+          <div aria-hidden className="surface-grid pointer-events-none absolute inset-0 opacity-60" />
+          <div className="relative flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-[15px] font-semibold text-ink-text">Fuel tank</h2>
-              <p className="text-[12px] text-ink-muted">
-                Each verified payment deducts one credit at{" "}
-                <span className="data text-ink-text">{formatNaira(wallet.unitKobo)}</span> for the {TIER_LABEL[wallet.tier]} tier.
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-white/25 bg-white/10">
+                  <Fuel className="h-4 w-4 text-white" aria-hidden />
+                </span>
+                <div>
+                  <p className="text-[13px] font-medium text-white/85">Wallet balance</p>
+                  <p className="text-[12px] text-white/70">
+                    Each verified payment deducts one credit at{" "}
+                    <span className="money font-medium text-white">{formatNaira(wallet.unitKobo)}</span>
+                  </p>
+                </div>
+              </div>
+              <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span
+                  key={wallet.balanceCredits}
+                  className="count-in money text-[52px] font-semibold leading-none tracking-tight text-white"
+                >
+                  {wallet.balanceCredits}
+                </span>
+                <span className="text-[14px] text-white/75">credits available</span>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/70">
+                <Badge variant="neutral" className="border-white/25 bg-white/10 text-[11px] text-white">
+                  {TIER_LABEL[wallet.tier]}
+                </Badge>
+                <span>
+                  Floor at <span className="data font-medium text-white">{wallet.lowThreshold}</span> credits
+                  {" · "}
+                  last burn{" "}
+                  {wallet.transactions.find((t) => t.type === "consume")
+                    ? timeAgo(wallet.transactions.find((t) => t.type === "consume")!.createdAt)
+                    : "never"}
+                </span>
+                <span>Resets on every top-up · no expiry</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button size="md" className="h-11 bg-white text-ocean hover:bg-white/90" onClick={onTopUp}>
+                Top up credits
+              </Button>
+              <p aria-hidden className="flex items-center gap-1.5 self-end text-[12px] text-white/70">
+                {wallet.balanceCredits > 0 ? (
+                  <>
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/85" /> live
+                  </>
+                ) : (
+                  <>
+                    <span className="h-1.5 w-1.5 rounded-full bg-bad" /> locked
+                  </>
+                )}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={TIER_TONE[wallet.tier]} dot>
-              {TIER_LABEL[wallet.tier]}
-            </Badge>
-            <Button size="sm" className="h-11" onClick={onTopUp}>
-              Top up credits
-            </Button>
-          </div>
         </div>
 
+        {/* Meter + controls */}
         <div className="flex flex-col gap-5 p-5">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <span
-                key={wallet.balanceCredits}
-                className="count-in data text-[56px] font-semibold leading-none text-ink-text"
-              >
-                {wallet.balanceCredits}
-              </span>
-              <span className="text-[14px] text-ink-faint">credits available</span>
-            </div>
-            <div className="flex items-center gap-3 text-[12px] text-ink-muted">
-              <span aria-hidden className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-good" /> healthy
-              </span>
-              <span aria-hidden className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-warn" /> low
-              </span>
-              <span aria-hidden className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-bad" /> zero
-              </span>
-            </div>
-          </div>
-
           <FuelTankMeter wallet={wallet} pct={pct} />
-
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[12px] text-ink-faint">
-            <span>
-              Floor at <span className="data text-ink-text">{wallet.lowThreshold}</span> credits
-              {" · "}
-              last burn {wallet.transactions.find((t) => t.type === "consume") ? timeAgo(wallet.transactions.find((t) => t.type === "consume")!.createdAt) : "never"}
-            </span>
-            <span>
-              Resets on every top-up · no expiry
-            </span>
-          </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="flex items-center justify-between gap-3 rounded-[10px] border border-line bg-panel px-4 py-3">
@@ -571,9 +574,9 @@ function WebhookEventLog({ events }: { events: WalletState["recentEvents"] }) {
     <Card>
       <CardContent className="p-0">
         <div className="border-b border-line px-5 py-4">
-          <h2 className="text-[15px] font-semibold text-ink-text">Recent webhook events</h2>
+          <h2 className="text-[15px] font-semibold text-ink-text">Ledger activity</h2>
           <p className="mt-0.5 text-[12px] text-ink-muted">
-            Latest PAYMENT_VERIFIED, lockout, and top-up events.
+            Latest payments, lockouts, and top-ups — every credit accounted for.
           </p>
         </div>
         <div className="flex flex-col divide-y divide-line">
@@ -600,8 +603,8 @@ function WebhookEventLog({ events }: { events: WalletState["recentEvents"] }) {
                     ) : null}
                   </p>
                   <p className="mt-0.5 text-[12px] text-ink-muted">
-                    Balance after <span className="data text-ink-text">{e.balanceAfter}</span> credits
-                    {e.amountKobo ? <> · <span className="data">{formatNaira(e.amountKobo)}</span></> : null}
+                    Balance after <span className="money text-ink-text">{e.balanceAfter}</span> credits
+                    {e.amountKobo ? <> · <span className="money">{formatNaira(e.amountKobo)}</span></> : null}
                   </p>
                 </div>
               </div>
@@ -745,7 +748,7 @@ function TopUpDialog({
                     )}
                   >
                     <span className="flex items-center gap-2 text-[14px] font-semibold">
-                      <span className="data text-ink-text">{b.credits.toLocaleString()}</span>
+                      <span className="money text-[18px] text-ink-text">{b.credits.toLocaleString()}</span>
                       <span className="text-[12px] font-normal text-ink-muted">credits</span>
                       {b.bonus ? (
                         <span className="rounded-[4px] border border-good-line bg-good-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-good-text">
@@ -754,8 +757,8 @@ function TopUpDialog({
                       ) : null}
                     </span>
                     <span className="text-[12px] text-ink-muted">{b.blurb}</span>
-                    <span className="data text-[12px] text-ink-faint">
-                      = N{((b.credits * unitKobo) / 100).toLocaleString("en-NG")}
+                    <span className="money text-[13px] font-medium text-aqua-text">
+                      N{((b.credits * unitKobo) / 100).toLocaleString("en-NG")}
                     </span>
                   </button>
                 );

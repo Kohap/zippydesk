@@ -1,23 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
 @theme {
-  /* Surfaces: neutral slate ink, no blue cast. */
-  --color-ink: #0f1418;
-  --color-panel: #151b21;
-  --color-panel-2: #1a2229;
-  --color-panel-3: #202a32;
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.14);
+  /* Surfaces: night-navy fintech ink, no brown cast. */
+  --color-ink: #0a0e15;
+  --color-panel: #10161f;
+  --color-panel-2: #151d28;
+  --color-panel-3: #1c2634;
+  --color-line: rgba(153, 168, 186, 0.1);
+  --color-line-strong: rgba(153, 168, 186, 0.18);
 
   /* Text */
-  --color-ink-text: #e9eef2;
-  --color-ink-muted: #a2aeb8;
-  --color-ink-faint: #6b7883;
+  --color-ink-text: #f1f5f9;
+  --color-ink-muted: #9fb0c1;
+  --color-ink-faint: #5e6f80;
 
   /* Brand: deep ocean to aqua (user-specified) */
-  --color-ocean: #006b8c;
-  --color-aqua: #00bca3;
-  --color-aqua-bright: #2fd8bd;
+  --color-ocean: #00799c;
+  --color-aqua: #00bfa6;
+  --color-aqua-bright: #37e2c6;
 
   /* Semantics */
   --color-good: #3ecf97;
@@ -28,24 +29,24 @@
   --color-warn-soft: rgba(242, 180, 76, 0.12);
   --color-warn-line: rgba(242, 180, 76, 0.3);
   --color-warn-text: #ffcf7e;
-  --color-bad: #ef5a5f;
-  --color-bad-soft: rgba(239, 90, 95, 0.12);
-  --color-bad-line: rgba(239, 90, 95, 0.3);
-  --color-bad-text: #ff8f93;
-  --color-info: #4aa3df;
-  --color-aqua-soft: rgba(0, 188, 163, 0.1);
-  --color-aqua-line: rgba(0, 188, 163, 0.3);
+  --color-bad: #f0565b;
+  --color-bad-soft: rgba(239, 86, 91, 0.12);
+  --color-bad-line: rgba(239, 86, 91, 0.3);
+  --color-bad-text: #ff9498;
+  --color-info: #4da5e4;
+  --color-aqua-soft: rgba(0, 191, 166, 0.1);
+  --color-aqua-line: rgba(0, 191, 166, 0.3);
   --color-aqua-text: #63e3cb;
-  --color-ocean-soft: rgba(0, 107, 140, 0.18);
-  --color-ocean-line: rgba(0, 107, 140, 0.4);
+  --color-ocean-soft: rgba(0, 121, 156, 0.18);
+  --color-ocean-line: rgba(0, 121, 156, 0.4);
   --color-ocean-text: #7cc6de;
 
-  --radius-control: 10px;
-  --radius-card: 14px;
-  --radius-chip: 6px;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-chip: 5px;
 
-  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 :root {
@@ -111,16 +112,18 @@ body {
   color: transparent;
 }
 
-/* Primary action: single filled brand button, no glow, no shadow, no lift. */
+/* Primary action: single filled brand button, crisp edge, quiet glow. */
 .btn-brand {
-  background-image: linear-gradient(135deg, #007ba0 0%, var(--color-aqua) 100%);
+  background-image: linear-gradient(135deg, #0085ab 0%, #00bfa6 100%);
   color: #ffffff;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.12) inset, 0 8px 20px -12px rgba(0, 191, 166, 0.55);
 }
 .btn-brand:hover {
-  background-image: linear-gradient(135deg, #0088af 0%, #16cfb3 100%);
+  background-image: linear-gradient(135deg, #0090ba 0%, #12cdb1 100%);
 }
 .btn-brand:active {
-  background-image: linear-gradient(135deg, #00658a 0%, #00a88f 100%);
+  background-image: linear-gradient(135deg, #006f92 0%, #00a88f 100%);
+  box-shadow: none;
 }
 .btn-brand:disabled {
   opacity: 0.45;
@@ -156,15 +159,29 @@ body {
   cursor: not-allowed;
 }
 
-/* Panel card: tonal lift over ink, quiet border. */
+/* Panel card: tonal lift over ink, quiet border, hairline elevation. */
 .card {
-  background: var(--color-panel);
+  background: linear-gradient(180deg, var(--color-panel) 0%, color-mix(in srgb, var(--color-panel) 92%, #0a0e15) 100%);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.02) inset, 0 10px 24px -18px rgba(0, 0, 0, 0.8);
+}
+
+/* Elevated balance / hero surfaces. */
+.card-elevated {
+  background: linear-gradient(160deg, var(--color-panel-2) 0%, var(--color-panel) 70%);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 24px 48px -28px rgba(0, 0, 0, 0.9);
+}
+
+/* Brand panel: gradient header band for balance cards. */
+.brand-band {
+  background-image: linear-gradient(135deg, #005f85 0%, #00799c 45%, #00bfa6 100%);
 }
 
 .card-hover {
-  transition: border-color 120ms ease;
+  transition: border-color 120ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
 .card-hover:hover {
   border-color: var(--color-line-strong);
@@ -175,6 +192,21 @@ body {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
+}
+
+/* Financial numerals: tabular so columns and balances line up. */
+.money {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Ambient grid texture for fintech surfaces. */
+.surface-grid {
+  background-image:
+    linear-gradient(rgba(153, 168, 186, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(153, 168, 186, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 .label-caps {
