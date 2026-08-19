@@ -1,6 +1,7 @@
 const nextConfig = {
   reactStrictMode: true,
   output: process.env.EXPORT_STATIC ? "export" : undefined,
+  basePath: process.env.EXPORT_STATIC ? "/zippydesk" : undefined,
   async headers() {
     return [
       {
