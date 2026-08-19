@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { RefreshCw, Timer, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
+import { RefreshCw, Timer, ArrowRight, CheckCircle2, XCircle, ChevronDown } from "lucide-react";
 import { usePoll } from "@/lib/use-poll";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -210,11 +210,22 @@ function VisionAudit({ rows }: { rows: DashboardData["visionAudit"] }) {
                 const confPct = Math.round(row.confidence * 100);
                 return (
                   <React.Fragment key={row.receiptMsgId}>
-                    <tr
-                      className="cursor-pointer transition-colors hover:bg-panel-2/50"
-                      onClick={() => setOpen(open === row.receiptMsgId ? null : row.receiptMsgId)}
-                    >
-                      <td className="data px-5 py-3 text-[13px] text-ink-text">{row.orderId}</td>
+                    <tr className="transition-colors hover:bg-panel-2/50">
+                      <td className="px-5 py-3">
+                        <button
+                          type="button"
+                          onClick={() => setOpen(open === row.receiptMsgId ? null : row.receiptMsgId)}
+                          aria-expanded={open === row.receiptMsgId}
+                          aria-label={`Toggle receipt details for ${row.orderId}`}
+                          className="flex min-h-[44px] items-center gap-2 rounded-[8px] text-left transition-colors hover:text-ink-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-aqua"
+                        >
+                          <span className="data text-[13px] font-medium text-ink-text">{row.orderId}</span>
+                          <ChevronDown
+                            className={cn("h-3.5 w-3.5 text-ink-faint transition-transform duration-100", open === row.receiptMsgId && "rotate-180")}
+                            aria-hidden
+                          />
+                        </button>
+                      </td>
                       <td className="data px-3 py-3 text-[13px] text-ink-muted">{row.narration || "-"}</td>
                       <td className="data px-3 py-3 text-right text-[13px] text-ink-text">{formatNaira(row.amountKobo)}</td>
                       <td className="px-3 py-3">
