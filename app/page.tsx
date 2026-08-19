@@ -319,7 +319,7 @@ export default function LandingPage() {
             ))}
           </div>
           <div className="mx-auto mt-12 max-w-6xl">
-            <h3 className="label-caps text-center">Built for merchants who take payments seriously</h3>
+            <p className="label-caps text-center">Built for merchants who take payments seriously</p>
             <div className="mt-5 grid gap-3 text-[14px] text-ink-muted sm:grid-cols-2">
               {BENEFITS.map((b) => (
                 <div key={b.title} className="flex items-start gap-3 rounded-[12px] border border-line bg-panel p-4 leading-relaxed">
