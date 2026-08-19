@@ -1,1 +1,0 @@
-"use strict";exports.id=914,exports.ids=[914],exports.modules={27914:(a,b,c)=>{c.d(b,{getPrisma:()=>f});var d=c(96330);let e="__zippydesk_prisma__";function f(){let a=globalThis;if(a[e])return a[e];let b=new d.PrismaClient;return a[e]=b,b}}};
