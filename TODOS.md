@@ -10,7 +10,7 @@ Generated 2026-08-19 by QA of `localhost:3000` (zippyDesk demo). Baseline: healt
 | 004 | Simulator copy implies order is booked | LOW | ✅ Fixed | copy updated (drill-only) | QA |
 | 005 | Calculator "(-150 over the tier)" under-tier label | LOW | ✅ Fixed | conditional label | QA |
 | 006 | Empty/error submits show empty alerts | LOW | ⏳ Deferred | enrich alert text behind submit handlers | Product |
-| 007 | /terms not linked in footer | LOW | ⏳ Deferred | add ToS link to landing footer | Product |
+| 007 | /terms not linked in footer | LOW | ✅ Fixed | footer Terms link added in fintech redesign | QA |
 | — | Dev server wedged (133% CPU, 21d uptime) | INFRA | ✅ Restarted | monitor; consider a health/restart guard | DevOps |
 
 ## Verification
