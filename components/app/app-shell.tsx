@@ -115,7 +115,7 @@ export function AppShell({
                 aria-label="Switch merchant"
                 value={merchant.id}
                 onChange={(e) => void switchMerchant(e.target.value)}
-                className="h-8 w-8 cursor-pointer rounded-[10px] border border-line bg-panel-2 text-ink-faint"
+                className="h-11 w-11 cursor-pointer rounded-[8px] border border-line bg-panel-2 text-[12px] text-ink-muted transition-colors hover:border-line-strong"
               >
                 {merchants.map((m) => (
                   <option key={m.id} value={m.id}>
