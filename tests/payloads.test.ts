@@ -9,6 +9,8 @@ describe("button payloads", () => {
       { a: "done", v: "A3" },
       { a: "ap", o: "7451" },
       { a: "rj", o: "7451" },
+      { a: "pv", o: "7451" },
+      { a: "dr", o: "7451" },
       { a: "rd", o: "7451" },
     ] as const;
     for (const action of actions) {

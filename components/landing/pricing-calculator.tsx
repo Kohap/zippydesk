@@ -21,7 +21,7 @@ export function PricingCalculator() {
   return (
     <div className="card overflow-hidden">
       <div className="grid md:grid-cols-[1fr_1.2fr]">
-        <div className="flex flex-col gap-5 p-6 md:p-8">
+        <div className="flex flex-col gap-5 border-b border-line p-5 sm:p-6 md:border-b-0 md:p-8">
           <div>
             <h3 className="text-[17px] font-semibold text-ink-text">Pick a base tier</h3>
             <p className="mt-1 text-[13px] text-ink-muted">
@@ -29,41 +29,48 @@ export function PricingCalculator() {
             </p>
           </div>
           <div className="flex flex-col gap-2.5" role="radiogroup" aria-label="Base tier">
-            {PRICING_TIERS.map((t) => (
-              <label
-                key={t.id}
-                className={cn(
-                  "flex cursor-pointer items-center justify-between gap-3 rounded-[10px] border px-4 py-3.5 transition-colors duration-100",
-                  t.id === tierId
-                    ? "border-aqua/60 bg-[rgba(0,188,163,0.07)]"
-                    : "border-line bg-panel hover:border-line-strong",
-                )}
-              >
-                <input
-                  type="radio"
-                  name="tier"
-                  value={t.id}
-                  checked={tierId === tierId}
-                  onChange={() => setTierId(t.id)}
-                  className="sr-only"
-                />
-                <span className="min-w-0">
-                  <span className="block text-[15px] font-semibold text-ink-text">{t.name}</span>
-                  <span className="block text-[12px] text-ink-muted">{t.blurb}</span>
-                </span>
-                <span className="shrink-0 text-right">
-                  <span className="block text-[15px] font-semibold text-ink-text">
-                    {formatNgn(t.baseMonthly)}
-                    <span className="text-[12px] font-normal text-ink-faint">/mo</span>
+            {PRICING_TIERS.map((t) => {
+              const selected = t.id === tierId;
+              return (
+                <label
+                  key={t.id}
+                  className={cn(
+                    "flex cursor-pointer items-start justify-between gap-3 rounded-[10px] border px-4 py-3.5 transition-colors duration-100",
+                    "min-h-[56px] sm:min-h-[60px]",
+                    selected
+                      ? "border-aqua/60 bg-[rgba(0,188,163,0.07)]"
+                      : "border-line bg-panel hover:border-line-strong",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="tier"
+                    value={t.id}
+                    checked={selected}
+                    onChange={() => setTierId(t.id)}
+                    aria-label={t.name}
+                    className="sr-only"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[15px] font-semibold text-ink-text">{t.name}</span>
+                    <span className="block text-[12px] leading-snug text-ink-muted">{t.blurb}</span>
                   </span>
-                  <span className="block text-[12px] text-ink-faint">{t.includedCredits.toLocaleString()} credits</span>
-                </span>
-              </label>
-            ))}
+                  <span className="shrink-0 text-right">
+                    <span className="block text-[15px] font-semibold text-ink-text">
+                      {formatNgn(t.baseMonthly)}
+                      <span className="text-[12px] font-normal text-ink-faint">/mo</span>
+                    </span>
+                    <span className="block text-[12px] text-ink-faint">
+                      {t.includedCredits.toLocaleString()} credits
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
           </div>
         </div>
 
-        <div className="flex flex-col justify-between gap-6 border-t border-line bg-panel-2 p-6 md:border-l md:border-t-0 md:p-8">
+        <div className="flex flex-col justify-between gap-6 bg-panel-2 p-5 sm:p-6 md:p-8">
           <div>
             <div className="flex items-center justify-between">
               <label htmlFor="orders-slider" className="text-[13px] font-medium text-ink-muted">
@@ -88,19 +95,19 @@ export function PricingCalculator() {
             </div>
 
             <dl className="mt-6 flex flex-col gap-2.5 text-[14px]">
-              <div className="flex justify-between gap-3">
+              <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-muted">{tier.name} base</dt>
                 <dd className="data text-ink-text">{formatNgn(tier.baseMonthly)}</dd>
               </div>
-              <div className="flex justify-between gap-3">
+              <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-muted">
                   {monthlyOrders.toLocaleString()} orders
-                  <span className="text-ink-faint">
+                  <span className="block text-[12px] text-ink-faint sm:inline">
                     {" "}
                     ({(monthlyOrders - tier.includedCredits).toLocaleString()} over the tier)
                   </span>
                 </dt>
-                <dd className="data text-ink-text">{formatNgn(overflowCost)}</dd>
+                <dd className="data shrink-0 text-ink-text">{formatNgn(overflowCost)}</dd>
               </div>
               <div className="my-1 border-t border-line" />
               <div className="flex items-baseline justify-between gap-3">

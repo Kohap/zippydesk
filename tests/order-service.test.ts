@@ -94,16 +94,21 @@ describe("gift architecture end-to-end", () => {
     expect(order.balanceDueKobo).toBe(500000);
   });
 
-  it("4. out-of-stock approval lands in FAILED_OUT_OF_STOCK then refund protocol", async () => {
+  it("4. out-of-stock approval lands in FAILED_OUT_OF_STOCK then closes the refund loop", async () => {
     const { service, repos, messenger } = setup();
     const orderId = await placeOrder(service, repos);
     await service.applyPayment(CUSTOMER, "w1", receipt(orderId, 500000, "w1"));
     (await repos.items.getByVendor("A3")).forEach((i) => ((i as { stock: number }).stock = 0));
 
     await service.approve(orderId, OWNER);
-    expect(await statusOf(repos, orderId)).toBe("FAILED_OUT_OF_STOCK");
+    // The atomic reservation fails fast and the refund protocol leg is closed
+    // immediately (FAILED_OUT_OF_STOCK --REFUND_PROTOCOL_START--> PENDING_REFUND).
+    expect(await statusOf(repos, orderId)).toBe("PENDING_REFUND");
 
     expect(messenger.sent.some((m) => m.type === "buttons" && JSON.stringify(m.payload).includes("URGENT REFUND REQUIRED"))).toBe(true);
+
+    await service.refundDone(orderId, OWNER);
+    expect(await statusOf(repos, orderId)).toBe("REFUNDED");
   });
 
   it("5. approval timer escalates to assistant; assistant can then approve", async () => {

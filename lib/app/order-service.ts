@@ -1,16 +1,16 @@
 import { buildNarration, parseNarration } from "../domain/narration";
 import { decidePayment, formatNaira } from "../domain/payments";
-import { statusHoldsCustomer, statusRequiresPayment } from "../domain/config";
+import { statusRequiresPayment } from "../domain/config";
 import type { Order, OrderItem, PaymentRecord } from "../domain/types";
 import type { ActorKind, OrderStatus } from "../domain/status";
 import type { Repositories } from "../ports/repositories";
 import type { VisionReceipt } from "../ports/vision";
+import type { OutboundImage } from "../ports/messenger";
 import type { Scheduler } from "../ports/scheduler";
 import type { VendorProvider } from "./vendor-provider";
 import type { CustomerChannel } from "./customer-channel";
 import { decodeButtonId, encodeButtonId } from "../infra/payloads";
 import { assertStateConsistency } from "../domain/state";
-import { commitApproval } from "./order-fsm";
 
 let orderSeq = 1000;
 const nextOrderId = () => String(++orderSeq);
@@ -32,14 +32,7 @@ export class OrderService {
 
   async startIntake(customerWaId: string): Promise<void> {
     const active = await this.firstActiveOrder(customerWaId);
-    if (active && statusHoldsCustomer(active.status)) {
-      if (active.status === "MANUAL_VERIFICATION_REQUIRED") {
-        await this.channel.sendText(customerWaId, `Your order (${active.id}) is on a short manual hold while we confirm capacity. We'll update you here shortly. Type cancel to back out.`, {
-          key: "order_manual_hold",
-          params: { order: active.id },
-        });
-        return;
-      }
+    if (active && statusRequiresPayment(active.status)) {
       const vendor = this.vendors.get(active.vendorId);
       await this.channel.sendText(customerWaId, `You have an order (${active.id}) waiting. Send your transfer receipt or the narration GFT-${active.vendorId}-${active.id}.`, {
         key: "payment_instructions",
@@ -176,6 +169,14 @@ export class OrderService {
     }
     await this.repos.payments.save(this.paymentRecord(order.id, receiptMsgId, receipt, verdict, validationMs));
     await this.appendEvent(order.id, "customer", `payment_${verdict}`);
+    const vendorForFee = this.vendors.get(order.vendorId);
+    const fee = vendorForFee?.visionFeeCredits ?? 1;
+    const draw = await this.repos.wallet.consumeCredit(vendorForFee?.merchantId ?? "merchant-parfait", order.id, "vision-payment-verified", fee);
+    if (!draw.ok) {
+      // Receipt already committed; a race drained the wallet. Log it for the
+      // billing review, never roll back a verified payment.
+      await this.appendEvent(order.id, "system", "vision_fee_debit_failed");
+    }
     const vendorForTemplate = this.vendors.get(order.vendorId);
     await this.channel.sendText(customerWaId, `Payment of ${formatNaira(receipt.amountKobo)} confirmed${verdict === "partial" ? `. Balance: ${formatNaira(nextBalance)}` : ""}.`, {
       key: "payment_received",
@@ -261,14 +262,7 @@ export class OrderService {
       return;
     }
     const active = await this.firstActiveOrder(customerWaId);
-    if (active && statusHoldsCustomer(active.status)) {
-      if (active.status === "MANUAL_VERIFICATION_REQUIRED") {
-        await this.channel.sendText(customerWaId, `Your order (${active.id}) is on a short manual hold while we confirm capacity. We'll update you here shortly. Type cancel to back out.`, {
-          key: "order_manual_hold",
-          params: { order: active.id },
-        });
-        return;
-      }
+    if (active && statusRequiresPayment(active.status)) {
       const vendor = this.vendors.get(active.vendorId);
       await this.channel.sendText(
         customerWaId,
@@ -304,8 +298,11 @@ export class OrderService {
       case "ap":
         await this.approve(action.o, customerWaId);
         break;
-      case "mv":
-        await this.approve(action.o, customerWaId);
+      case "pv":
+        await this.resolveManualPayment(action.o, customerWaId, true);
+        break;
+      case "dr":
+        await this.resolveManualPayment(action.o, customerWaId, false);
         break;
       case "rj":
         await this.reject(action.o, customerWaId);
@@ -316,20 +313,114 @@ export class OrderService {
     }
   }
 
+  /**
+   * Owner-only resolution of a manually reviewed receipt (wallet-empty
+   * fallback). Dequeues the pending review FIRST so stale presses (the order
+   * meanwhile moved on: AI-verified, converged, or TTL-cancelled) still clear
+   * the queue instead of leaking phantom pending reviews or nudging an order
+   * they no longer apply to.
+   */
+  async resolveManualPayment(orderRef: string, waId: string, accepted: boolean): Promise<void> {
+    const pending = await this.repos.manualReviews.consume(orderRef);
+    if (!pending) return;
+    const order = await this.repos.orders.getById(orderRef);
+    if (!order) return;
+    const vendor = this.vendors.get(order.vendorId);
+    const owner = vendor?.escalation.find((e) => e.role === "owner" && e.waId === waId);
+    if (!owner) return;
+    if (!accepted) {
+      await this.appendEvent(order.id, "owner", "manual_review_rejected");
+      await this.channel.sendText(
+        order.customerWaId,
+        `We could not verify the receipt you sent for order ${order.id}. Please re-send a clear screenshot of the transfer receipt.`,
+      );
+      return;
+    }
+    if (!statusRequiresPayment(order.status)) {
+      // The order already moved on (e.g. receipt AI-verified meanwhile);
+      // the pending review is cleared, nothing left to apply.
+      return;
+    }
+    const remaining = order.balanceDueKobo;
+    if (remaining <= 0) return;
+    const ok = await this.repos.orders.guardTransition(order.id, order.status, {
+      status: "PENDING_APPROVAL",
+      amountPaidKobo: order.amountPaidKobo + remaining,
+      balanceDueKobo: 0,
+    });
+    if (!ok) return;
+    await this.repos.payments.save({
+      id: `pmt-manual-${order.id}`,
+      orderId: order.id,
+      amountKobo: remaining,
+      narration: "MANUAL-VERIFIED",
+      visionJson: null,
+      receiptMsgId: pending.mediaMsgId,
+      verdict: "manual",
+      createdAt: new Date(),
+    });
+    await this.appendEvent(order.id, "owner", "payment_manual_verified");
+    await this.channel.sendText(order.customerWaId, `Payment for order ${order.id} confirmed manually.`, {
+      key: "payment_received",
+      params: { amount: formatNaira(remaining), vendor: vendor?.name ?? order.vendorId, order: order.id },
+    });
+    await this.scheduler.cancelOrder(order.id);
+    await this.scheduler.scheduleApproval(order.id, (vendor?.timers.approvalMinutes ?? 5) * 60_000);
+    await this.requestApproval(order, "owner");
+  }
+
+  /**
+   * Wallet-empty vision fallback executed by the ingestion layer: skip the AI
+   * call, park the receipt for the owner, and forward the raw image.
+   * `orderId` is the order the ingestion gate already resolved for the wallet
+   * check — never re-locate the order here, or a multi-vendor customer could
+   * get a different merchant's order reviewed.
+   */
+  async receiptManualFallback(orderId: string, customerWaId: string, senderWaId: string, mediaMsgId: string, image: OutboundImage): Promise<void> {
+    const order = await this.repos.orders.getById(orderId);
+    const vendor = order ? this.vendors.get(order.vendorId) : null;
+    await this.repos.manualReviews.save({
+      orderId: order?.id ?? `unknown-${mediaMsgId}`,
+      vendorId: order?.vendorId ?? "",
+      customerWaId,
+      senderWaId,
+      mediaMsgId,
+      notes: "wallet-empty manual review",
+      createdAt: new Date(),
+    });
+    await this.channel.sendText(
+      customerWaId,
+      order
+        ? `Your receipt for order ${order.id} is being reviewed by a staff member — we'll confirm your payment here shortly.`
+        : "We're having our team review your receipt manually — we'll confirm shortly.",
+    );
+    const owner = vendor?.escalation.find((e) => e.role === "owner");
+    if (!owner) return;
+    await this.channel.sendImage(owner.waId, image);
+    await this.channel.sendButtons(
+      owner.waId,
+      `Manual verification needed on order ${order?.id ?? "unknown"}: the merchant wallet has no credits for OCR, and this receipt could not be machine-read. Review the raw image above.`,
+      order
+        ? [
+            { id: encodeButtonId({ a: "pv", o: order.id }), title: "Payment verified" },
+            { id: encodeButtonId({ a: "dr", o: order.id }), title: "Reject receipt" },
+          ]
+        : [],
+    );
+  }
+
   private async approveOrReject(orderRef: string, waId: string, approve: boolean): Promise<void> {
     const order = await this.repos.orders.getById(orderRef);
-    if (!order || !["PENDING_APPROVAL", "MANUAL_VERIFICATION_REQUIRED"].includes(order.status)) return;
+    if (!order || order.status !== "PENDING_APPROVAL") return;
     const vendor = this.vendors.get(order.vendorId);
     if (!vendor) return;
     const entry = vendor.escalation.find((e) => e.waId === waId);
     if (!entry) return;
     const actor = entry.role as ActorKind;
     if (actor === "assistant" && order.escalationLevel !== 1) return;
-    // Manual verification is owner-only; the assistant never re-runs the hot path.
-    if (actor === "assistant" && order.status === "MANUAL_VERIFICATION_REQUIRED") return;
 
     if (!approve) {
-      const ok = await this.repos.orders.guardTransition(order.id, order.status, { status: "PENDING_REFUND" });
+      const ok = await this.repos.orders.guardTransition(order.id, "PENDING_APPROVAL", { status: "PENDING_REFUND" });
       if (!ok) return;
       await this.scheduler.cancelOrder(order.id);
       await this.appendEvent(order.id, actor, "rejected");
@@ -337,79 +428,30 @@ export class OrderService {
       return;
     }
 
-    const okayBranch = order.status === "MANUAL_VERIFICATION_REQUIRED" && actor === "owner"
-      ? "OWNER_MANUAL_RESOLVED"
-      : actor === "assistant"
-        ? "ASSISTANT_APPROVE"
-        : "OWNER_APPROVE";
-    const verdict = await commitApproval(this.repos, {
-      vendorId: order.vendorId,
-      merchantId: vendor.merchantId,
-      orderId: order.id,
-      items: order.items,
-    });
-    const expected = order.status;
-    switch (verdict) {
-      case "approved": {
-        const ok = await this.repos.orders.guardTransition(order.id, expected, { status: "APPROVED" });
-        if (!ok) return;
-        await this.scheduler.cancelOrder(order.id);
-        await this.appendEvent(order.id, actor, "approved");
-        await this.channel.sendText(order.customerWaId, `Order ${order.id} confirmed. We'll be in touch!`, {
-          key: "order_confirmed",
-          params: {
-            vendor: vendor.name,
-            order: order.id,
-            items: order.items.map((i) => `${i.name} x${i.qty}`).join(", "),
-          },
-        });
-        return;
-      }
-      case "failed_out_of_stock": {
-        const ok = await this.repos.orders.guardTransition(order.id, expected, { status: "FAILED_OUT_OF_STOCK" });
-        if (!ok) return;
-        await this.scheduler.cancelOrder(order.id);
-        await this.appendEvent(order.id, actor, "approve_failed_out_of_stock");
-        await this.startRefund(order, "out_of_stock");
-        // Close the protocol leg: FAILED_OUT_OF_STOCK --REFUND_PROTOCOL_START--> PENDING_REFUND,
-        // so the owner's "Refund Completed" press can finish the loop.
-        await this.repos.orders.guardTransition(order.id, "FAILED_OUT_OF_STOCK", { status: "PENDING_REFUND" });
-        return;
-      }
-      case "manual_verification_required": {
-        if (order.status === "MANUAL_VERIFICATION_REQUIRED") {
-          // Re-attempt while still empty: restock already compensated below,
-          // re-notify so the owner knows the retry did not clear.
-          await this.requestManualResolution(order, vendor);
-          return;
-        }
-        const ok = await this.repos.orders.guardTransition(order.id, expected, { status: "MANUAL_VERIFICATION_REQUIRED" });
-        if (!ok) return;
-        await this.scheduler.cancelOrder(order.id);
-        await this.appendEvent(order.id, actor, "manual_verification_required");
-        await this.requestManualResolution(order, vendor);
-        return;
-      }
+    const changed = await this.repos.items.atomicDecrement(order.vendorId, order.items);
+    if (changed === order.items.length) {
+      const ok = await this.repos.orders.guardTransition(order.id, "PENDING_APPROVAL", { status: "APPROVED" });
+      if (!ok) return;
+      await this.scheduler.cancelOrder(order.id);
+      await this.appendEvent(order.id, actor, "approved");
+      await this.channel.sendText(order.customerWaId, `Order ${order.id} confirmed. We'll be in touch!`, {
+        key: "order_confirmed",
+        params: {
+          vendor: vendor.name,
+          order: order.id,
+          items: order.items.map((i) => `${i.name} x${i.qty}`).join(", "),
+        },
+      });
+    } else {
+      const ok = await this.repos.orders.guardTransition(order.id, "PENDING_APPROVAL", { status: "FAILED_OUT_OF_STOCK" });
+      if (!ok) return;
+      await this.scheduler.cancelOrder(order.id);
+      await this.appendEvent(order.id, actor, "approve_failed_out_of_stock");
+      await this.startRefund(order, "out_of_stock");
+      // Close the protocol leg: FAILED_OUT_OF_STOCK --REFUND_PROTOCOL_START--> PENDING_REFUND,
+      // so the owner's "Refund Completed" press can finish the loop.
+      await this.repos.orders.guardTransition(order.id, "FAILED_OUT_OF_STOCK", { status: "PENDING_REFUND" });
     }
-  }
-
-  private async requestManualResolution(order: Order, vendor: ReturnType<VendorProvider["get"]> & {}): Promise<void> {
-    await this.channel.sendText(
-      order.customerWaId,
-      `Order ${order.id} is on a short manual hold while we confirm capacity — we'll update you shortly.`,
-      { key: "order_manual_hold", params: { order: order.id } },
-    );
-    const owner = vendor?.escalation.find((e) => e.role === "owner");
-    if (!owner) return;
-    await this.channel.sendButtons(
-      owner.waId,
-      `Order ${order.id} was approved on your side but the ${vendor?.merchantId ?? "merchant"} credit wallet is empty. Top up the wallet, then complete the order — or refund the customer instead.`,
-      [
-        { id: encodeButtonId({ a: "mv", o: order.id }), title: "Credit added — complete" },
-        { id: encodeButtonId({ a: "rj", o: order.id }), title: "Refund instead" },
-      ],
-      { key: "manual_verification_required", params: { order: order.id, merchant: vendor?.merchantId ?? "" } },
-    );
   }
 
   private async startRefund(order: Order, reason: string): Promise<void> {
@@ -433,7 +475,7 @@ export class OrderService {
 
   private async transitionCancel(orderId: string, cause: "customer_cancel" | "payment_ttl"): Promise<void> {
     const order = await this.repos.orders.getById(orderId);
-    if (!order || !["ORDER_PENDING_PAYMENT", "PARTIALLY_PAID", "MANUAL_VERIFICATION_REQUIRED"].includes(order.status)) return;
+    if (!order || !["ORDER_PENDING_PAYMENT", "PARTIALLY_PAID"].includes(order.status)) return;
     const ok = await this.repos.orders.guardTransition(order.id, order.status, { status: "CANCELLED" });
     if (!ok) return;
     await this.scheduler.cancelOrder(order.id);
@@ -477,6 +519,22 @@ export class OrderService {
     const order = await this.repos.orders.getActiveByCustomerAndVendor(customerWaId, vendorId);
     if (!order || !statusRequiresPayment(order.status)) return null;
     return order;
+  }
+
+  /** Ingestion-gate locator: the payment-state order whose merchant wallet
+   * gates the vision call. */
+  async getActivePaymentOrder(customerWaId: string): Promise<Order | null> {
+    for (const vendor of this.vendors.all()) {
+      const order = await this.activePaymentOrder(customerWaId, vendor.id);
+      if (order) return order;
+    }
+    return null;
+  }
+
+  /** Merchant resolution for the vision gate (wallet + fee for a vendor). */
+  merchantOf(vendorId: string): { merchantId: string; visionFeeCredits: number } {
+    const vendor = this.vendors.get(vendorId);
+    return { merchantId: vendor?.merchantId ?? "merchant-parfait", visionFeeCredits: vendor?.visionFeeCredits ?? 1 };
   }
 
   private async firstActiveOrder(customerWaId: string): Promise<Order | null> {

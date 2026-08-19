@@ -6,6 +6,8 @@ import type {
   EventsRepo,
   IngestedRepo,
   ItemsRepo,
+  ManualReviewRepo,
+  ManualReviewRef,
   NewOrder,
   OrdersRepo,
   PaymentsRepo,
@@ -155,10 +157,10 @@ export class PrismaWalletRepo implements WalletRepo {
    * a funded wallet, so concurrent approvals can never overdraw. When the
    * balance is empty the wallet also stops accepting orders until recharged.
    */
-  async consumeCredit(merchantId: string, _orderId: string, _reason: string): Promise<ConsumeCreditResult> {
+  async consumeCredit(merchantId: string, _orderId: string, _reason: string, amount = 1): Promise<ConsumeCreditResult> {
     const { count } = await this.prisma.wallet.updateMany({
-      where: { merchantId, balanceCredits: { gte: 1 } },
-      data: { balanceCredits: { decrement: 1 } },
+      where: { merchantId, balanceCredits: { gte: amount } },
+      data: { balanceCredits: { decrement: amount } },
     });
     const balanceAfter = await this.getBalance(merchantId);
     if (count !== 1) {
@@ -288,6 +290,59 @@ export class PrismaIngestedRepo implements IngestedRepo {
   }
 }
 
+export class PrismaManualReviewRepo implements ManualReviewRepo {
+  constructor(private prisma: PrismaClient) {}
+
+  async save(ref: ManualReviewRef): Promise<void> {
+    await this.prisma.manualReview.create({
+      data: {
+        orderId: ref.orderId,
+        vendorId: ref.vendorId,
+        customerWaId: ref.customerWaId,
+        senderWaId: ref.senderWaId,
+        mediaMsgId: ref.mediaMsgId,
+        notes: ref.notes,
+      },
+    });
+  }
+
+  async consume(orderId: string): Promise<ManualReviewRef | null> {
+    const [row] = await this.prisma.$transaction(async (tx) => {
+      const rows = await tx.manualReview.findMany({
+        where: { orderId },
+        take: 1,
+        orderBy: { createdAt: "asc" },
+      });
+      if (!rows[0]) return [] as never[];
+      await tx.manualReview.deleteMany({ where: { orderId } });
+      return rows;
+    });
+    if (!row) return null;
+    return {
+      orderId: row.orderId,
+      vendorId: row.vendorId,
+      customerWaId: row.customerWaId,
+      senderWaId: row.senderWaId,
+      mediaMsgId: row.mediaMsgId,
+      notes: row.notes,
+      createdAt: row.createdAt,
+    };
+  }
+
+  async listPending(): Promise<ManualReviewRef[]> {
+    const rows = await this.prisma.manualReview.findMany({ orderBy: { createdAt: "asc" } });
+    return rows.map((r) => ({
+      orderId: r.orderId,
+      vendorId: r.vendorId,
+      customerWaId: r.customerWaId,
+      senderWaId: r.senderWaId,
+      mediaMsgId: r.mediaMsgId,
+      notes: r.notes,
+      createdAt: r.createdAt,
+    }));
+  }
+}
+
 export function makePrismaRepositories(databaseUrl: string): Repositories {
   const prisma = new PrismaClient({ datasourceUrl: databaseUrl });
   return {
@@ -298,5 +353,45 @@ export function makePrismaRepositories(databaseUrl: string): Repositories {
     refunds: new PrismaRefundsRepo(prisma),
     ingested: new PrismaIngestedRepo(prisma),
     wallet: new PrismaWalletRepo(prisma),
+    manualReviews: new PrismaManualReviewRepo(prisma),
   };
+}
+
+/**
+ * Idempotent billing bootstrap: ensures a Merchant + Wallet row exists for
+ * every vendor configured in the app, so a fresh database starts funded
+ * (100k credits) instead of silently routing every receipt into the manual
+ * wallet-empty fallback.
+ */
+export async function bootstrapPrismaBilling(databaseUrl: string, vendors: Array<{ merchantId: string; name: string }>): Promise<void> {
+  const prisma = new PrismaClient({ datasourceUrl: databaseUrl });
+  try {
+    for (const v of vendors) {
+      await prisma.merchant.upsert({
+        where: { id: v.merchantId },
+        create: {
+          id: v.merchantId,
+          slug: v.merchantId,
+          name: v.name,
+          businessType: "retail",
+          phone: "",
+        },
+        update: {},
+      });
+      await prisma.wallet.upsert({
+        where: { merchantId: v.merchantId },
+        create: {
+          merchantId: v.merchantId,
+          balanceCredits: 100_000,
+          lowThreshold: 20,
+          autoRecharge: false,
+          autoRechargeAmount: 100,
+          acceptingOrders: true,
+        },
+        update: {},
+      });
+    }
+  } finally {
+    await prisma.$disconnect();
+  }
 }

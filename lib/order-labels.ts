@@ -9,8 +9,6 @@ export function receiptStatus(status: OrderStatus, escalationLevel: 0 | 1): Rece
   switch (status) {
     case "PENDING_APPROVAL":
       return { label: escalationLevel === 1 ? "Escalated to assistant" : "Receipt verified", variant: "brand" };
-    case "MANUAL_VERIFICATION_REQUIRED":
-      return { label: "Manual verification", variant: "warn" };
     case "ORDER_PENDING_PAYMENT":
       return { label: "Awaiting payment", variant: "neutral" };
     case "PARTIALLY_PAID":
@@ -32,7 +30,6 @@ export function receiptStatus(status: OrderStatus, escalationLevel: 0 | 1): Rece
 
 export function assignedActor(status: OrderStatus, escalationLevel: 0 | 1): string {
   if (status === "PENDING_APPROVAL") return escalationLevel === 1 ? "Assistant" : "Owner";
-  if (status === "MANUAL_VERIFICATION_REQUIRED") return "Owner";
   if (status === "PENDING_REFUND") return "Owner";
   if (status === "APPROVED" || status === "REFUNDED" || status === "FAILED_OUT_OF_STOCK" || status === "CANCELLED") return "System";
   return "Customer";
@@ -48,7 +45,6 @@ export function phoneLabel(waId: string): string {
 
 export const statusOrder = [
   "PENDING_APPROVAL",
-  "MANUAL_VERIFICATION_REQUIRED",
   "FAILED_OUT_OF_STOCK",
   "PENDING_REFUND",
   "ORDER_PENDING_PAYMENT",

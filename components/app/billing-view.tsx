@@ -74,7 +74,6 @@ export function Billing({ initial }: { initial: DashboardData }) {
 
   // Detect fresh zero-balance lockout and pop a blocking dialog.
   React.useEffect(() => {
-    if (!wallet.recentEvents.length) return;
     const latest = wallet.recentEvents[0];
     if (!latest) return;
     if (latest.event === "ZERO_BALANCE_LOCKOUT" && latest.id !== lastEventId) {

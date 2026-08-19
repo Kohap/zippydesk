@@ -1,11 +1,12 @@
 import { buildTemplateComponents, type TemplateRoute } from "../domain/templates";
-import type { Messenger, ButtonRow } from "../ports/messenger";
+import type { Messenger, ButtonRow, OutboundImage } from "../ports/messenger";
 import type { WindowStore } from "../ports/window";
 
 export interface CustomerChannel {
   sendText(waId: string, text: string, route?: TemplateRoute): Promise<void>;
   sendButtons(waId: string, body: string, rows: ButtonRow[], route?: TemplateRoute): Promise<void>;
   sendTemplate(waId: string, route: TemplateRoute): Promise<void>;
+  sendImage(waId: string, image: OutboundImage): Promise<void>;
 }
 
 export class WindowedMessenger implements CustomerChannel {
@@ -37,5 +38,9 @@ export class WindowedMessenger implements CustomerChannel {
 
   async sendTemplate(waId: string, route: TemplateRoute): Promise<void> {
     await this.inner.sendTemplate(waId, route.key, buildTemplateComponents(route));
+  }
+
+  async sendImage(waId: string, image: OutboundImage): Promise<void> {
+    await this.inner.sendImage(waId, image);
   }
 }

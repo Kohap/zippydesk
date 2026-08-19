@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAppContext } from "@/lib/context";
 import { getSessionMerchantId } from "@/lib/auth/route";
 import { consumeCredit } from "@/lib/api/wallet";
+import { WalletConsumeSchema } from "@/lib/validation/schemas";
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +15,14 @@ export async function POST(request: Request) {
   const ctx = getAppContext();
   const merchantId = getSessionMerchantId(request);
   if (!merchantId) return NextResponse.json({ error: "no session" }, { status: 401 });
-  const body = (await request.json().catch(() => null)) as { orderId?: string; reason?: string } | null;
-  const orderId = body?.orderId?.trim() || `sim-${Date.now()}`;
-  const reason = body?.reason?.trim() || "order_processed";
+  const raw = await request.json().catch(() => null);
+  const parsed = WalletConsumeSchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "invalid body", issues: parsed.error.issues }, { status: 400 });
+  }
+  const body = parsed.data;
+  const orderId = body.orderId?.trim() || `sim-${Date.now()}`;
+  const reason = body.reason?.trim() || "order_processed";
   try {
     const result = await consumeCredit(ctx, merchantId, orderId, reason);
     return NextResponse.json({ ok: true, ...result });

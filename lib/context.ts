@@ -14,7 +14,7 @@ import { WindowedMessenger } from "./app/customer-channel";
 import { InMemoryWindowStore } from "./ports/window";
 import { OrderService } from "./app/order-service";
 import { MaintenanceService } from "./app/maintenance";
-import { makePrismaRepositories } from "./infra/prisma-repos";
+import { makePrismaRepositories, bootstrapPrismaBilling } from "./infra/prisma-repos";
 import type { Repositories } from "./ports/repositories";
 import type { Messenger } from "./ports/messenger";
 import type { VisionExtractor } from "./ports/vision";
@@ -47,6 +47,11 @@ const DAY_MS = 24 * 3_600_000;
 export function buildContext(env: NodeJS.ProcessEnv): AppContext {
   const config = loadVendorConfig(env.VENDOR_CONFIG_PATH ? readFileSync(env.VENDOR_CONFIG_PATH, "utf8") : undefined);
   const repos = env.DATABASE_URL ? makePrismaRepositories(env.DATABASE_URL) : makeInMemoryRepositories(config);
+  if (env.DATABASE_URL) {
+    // Fresh databases must not silently park every receipt into the
+    // wallet-empty manual fallback: seed the configured merchants' wallets.
+    void bootstrapPrismaBilling(env.DATABASE_URL, config.vendors).catch((err) => console.error("billing bootstrap failed", err));
+  }
   const messenger =
     env.META_ACCESS_TOKEN && env.META_PHONE_NUMBER_ID
       ? new MetaMessenger(env.META_ACCESS_TOKEN, env.META_PHONE_NUMBER_ID)

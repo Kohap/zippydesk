@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { getAppContext } from "@/lib/context";
 import { handleWebhookPost, verifyWebhook, type WebhookDeps } from "@/lib/webhook/dispatch";
+import { rateLimitMiddleware } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,16 @@ function deps(): WebhookDeps {
   };
 }
 
+function verifySignature(body: string, signature: string | null): boolean {
+  const appSecret = process.env.META_APP_SECRET;
+  if (!appSecret || !signature) return false;
+  const expected = "sha256=" + createHmac("sha256", appSecret).update(body).digest("hex");
+  const sigBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expected);
+  if (sigBuffer.length !== expectedBuffer.length) return false;
+  return timingSafeEqual(sigBuffer, expectedBuffer);
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const query: Record<string, string | undefined> = {};
@@ -27,8 +39,18 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
-  if (body === null) return NextResponse.json({ received: 0 }, { status: 400 });
-  const received = await handleWebhookPost(body, deps());
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const rateLimit = rateLimitMiddleware(`webhook:${ip}`, 120);
+  if (rateLimit) return rateLimit;
+
+  const body = await request.text();
+  const signature = request.headers.get("x-hub-signature-256");
+  if (process.env.META_APP_SECRET && !verifySignature(body, signature)) {
+    return new Response("signature verification failed", { status: 403 });
+  }
+
+  const parsed = body ? JSON.parse(body) : null;
+  if (parsed === null) return NextResponse.json({ received: 0 }, { status: 400 });
+  const received = await handleWebhookPost(parsed, deps());
   return NextResponse.json({ received });
 }

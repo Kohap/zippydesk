@@ -54,18 +54,6 @@ export const TEMPLATE_CATALOG = {
     body: "Order {{order}} was cancelled: {{reason}}.",
     params: ["order", "reason"],
   },
-  order_manual_hold: {
-    name: "order_manual_hold",
-    language: "en",
-    body: "Your {{order}} order is on a short manual hold while we confirm capacity.",
-    params: ["order"],
-  },
-  manual_verification_required: {
-    name: "manual_verification_required",
-    language: "en",
-    body: "Manual verification: order {{order}} needs the {{merchant}} wallet funded before it can be completed.",
-    params: ["order", "merchant"],
-  },
   daily_refund_reminder: {
     name: "daily_refund_reminder",
     language: "en",

@@ -4,6 +4,8 @@ import type { OrderStatus } from "../domain/status";
 import type { MerchantBundle } from "./merchants";
 import type { WalletState } from "./wallet";
 
+import { maskWaId } from "../security/pii";
+
 export type { WalletState } from "./wallet";
 
 export interface OrderSummary extends Order {
@@ -166,7 +168,7 @@ export async function dashboardData(ctx: AppContext, merchantId: string): Promis
     merchant: bundle.merchant,
     vendors: bundle.vendors,
     wallet,
-    orders,
+    orders: orders.map((o) => ({ ...o, customerWaId: maskWaId(o.customerWaId) })),
     queue,
     kpis: {
       fuelTank: wallet.balanceCredits,

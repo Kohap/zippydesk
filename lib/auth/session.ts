@@ -42,5 +42,6 @@ export function verifySessionToken(token: string | undefined | null): SessionPay
 
 export function sessionCookieValue(merchantId: string): string {
   const token = createSessionToken(merchantId);
-  return `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`;
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax${secure}; Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`;
 }

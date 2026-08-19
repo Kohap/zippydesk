@@ -45,7 +45,8 @@ export type PaymentVerdict =
   | "partial"
   | "overpayment"
   | "unmatched"
-  | "duplicate";
+  | "duplicate"
+  | "manual";
 
 export interface PaymentRecord {
   id: string;

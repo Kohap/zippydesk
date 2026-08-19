@@ -5,8 +5,9 @@ export type ButtonAction =
   | { a: "add"; v: string; s: string; q: number }
   | { a: "done"; v: string }
   | { a: "ap"; o: string }
-  | { a: "mv"; o: string }
   | { a: "rj"; o: string }
+  | { a: "pv"; o: string }
+  | { a: "dr"; o: string }
   | { a: "rd"; o: string };
 
 export function encodeButtonId(action: ButtonAction): string {

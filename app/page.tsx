@@ -122,10 +122,6 @@ export default function LandingPage() {
             <div className="glow-drift absolute -top-10 right-1/4 h-64 w-64 rounded-full bg-aqua/25 blur-3xl" style={{ animationDelay: "4s" }} />
           </div>
           <div className="mx-auto max-w-3xl text-center">
-            <p className="label-caps mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-panel px-3 py-1.5">
-              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-aqua-bright" />
-              WhatsApp commerce, autonomous
-            </p>
             <h1 className="text-[32px] font-semibold leading-[1.1] tracking-tight text-ink-text sm:text-[44px] md:text-[56px]">
               Your customers can see you are online.
               <br className="hidden sm:block" />

@@ -1,0 +1,39 @@
+import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+
+const ALGORITHM = "aes-256-gcm";
+const KEY_LENGTH = 32;
+const IV_LENGTH = 16;
+const TAG_LENGTH = 16;
+
+function getKey(): Buffer {
+  const key = process.env.PII_ENCRYPTION_KEY;
+  if (!key || key.length !== KEY_LENGTH * 2) {
+    throw new Error(`PII_ENCRYPTION_KEY must be a ${KEY_LENGTH * 2}-char hex string`);
+  }
+  return Buffer.from(key, "hex");
+}
+
+export function encryptPII(plaintext: string): string {
+  const key = getKey();
+  const iv = randomBytes(IV_LENGTH);
+  const cipher = createCipheriv(ALGORITHM, key, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return Buffer.concat([iv, tag, encrypted]).toString("base64");
+}
+
+export function decryptPII(ciphertext: string): string {
+  const key = getKey();
+  const data = Buffer.from(ciphertext, "base64");
+  const iv = data.subarray(0, IV_LENGTH);
+  const tag = data.subarray(IV_LENGTH, IV_LENGTH + TAG_LENGTH);
+  const encrypted = data.subarray(IV_LENGTH + TAG_LENGTH);
+  const decipher = createDecipheriv(ALGORITHM, key, iv);
+  decipher.setAuthTag(tag);
+  return decipher.update(encrypted) + decipher.final("utf8");
+}
+
+export function maskWaId(waId: string): string {
+  if (waId.length < 8) return waId;
+  return `${waId.slice(0, 4)}***${waId.slice(-4)}`;
+}

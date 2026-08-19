@@ -4,6 +4,7 @@ export interface VendorProvider {
     name: string;
     bankAccount: string;
     merchantId: string;
+    visionFeeCredits: number;
     escalation: Array<{ role: "owner" | "assistant"; waId: string }>;
     timers: { approvalMinutes: number; paymentTtlHours: number };
     items: Array<{ sku: string; name: string; priceKobo: number; active: boolean }>;
@@ -13,6 +14,7 @@ export interface VendorProvider {
     name: string;
     bankAccount: string;
     merchantId: string;
+    visionFeeCredits: number;
     escalation: Array<{ role: "owner" | "assistant"; waId: string }>;
     timers: { approvalMinutes: number; paymentTtlHours: number };
     items: Array<{ sku: string; name: string; priceKobo: number; active: boolean }>;

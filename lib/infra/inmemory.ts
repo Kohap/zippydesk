@@ -4,6 +4,8 @@ import type {
   EventsRepo,
   IngestedRepo,
   ItemsRepo,
+  ManualReviewRepo,
+  ManualReviewRef,
   NewOrder,
   OrdersRepo,
   PaymentsRepo,
@@ -11,7 +13,7 @@ import type {
   Repositories,
   WalletRepo,
 } from "../ports/repositories";
-import type { Messenger } from "../ports/messenger";
+import type { Messenger, OutboundImage } from "../ports/messenger";
 import type { VisionExtractor, VisionReceipt } from "../ports/vision";
 import type { Scheduler, SchedulerHandlers } from "../ports/scheduler";
 import { hydrateVendorConfig, type VendorConfigFile } from "../domain/config";
@@ -115,11 +117,30 @@ export class InMemoryWalletRepo implements WalletRepo {
     this.balances.set(merchantId, balance);
   }
 
-  async consumeCredit(merchantId: string, _orderId: string, _reason: string) {
+  async consumeCredit(merchantId: string, _orderId: string, _reason: string, amount = 1) {
     const balance = this.balances.get(merchantId) ?? 0;
-    if (balance <= 0) return { ok: false, locked: true, balanceAfter: balance };
-    this.balances.set(merchantId, balance - 1);
-    return { ok: true, locked: false, balanceAfter: balance - 1 };
+    if (balance < amount) return { ok: false, locked: true, balanceAfter: balance };
+    this.balances.set(merchantId, balance - amount);
+    return { ok: true, locked: false, balanceAfter: balance - amount };
+  }
+}
+
+export class InMemoryManualReviewRepo implements ManualReviewRepo {
+  private pending = new Map<string, ManualReviewRef>();
+
+  async save(ref: ManualReviewRef): Promise<void> {
+    this.pending.set(ref.orderId, ref);
+  }
+
+  async consume(orderId: string): Promise<ManualReviewRef | null> {
+    const ref = this.pending.get(orderId);
+    if (!ref) return null;
+    this.pending.delete(orderId);
+    return ref;
+  }
+
+  async listPending(): Promise<ManualReviewRef[]> {
+    return [...this.pending.values()];
   }
 }
 
@@ -198,6 +219,7 @@ export function makeInMemoryRepositories(config: VendorConfigFile): Repositories
     refunds: new InMemoryRefundsRepo(),
     ingested: new InMemoryIngestedRepo(),
     wallet: new InMemoryWalletRepo(defaultWalletSeed(config)),
+    manualReviews: new InMemoryManualReviewRepo(),
   };
 }
 
@@ -221,6 +243,10 @@ export class RecordingMessenger implements Messenger {
 
   async sendTemplate(waId: string, templateName: string, components: unknown): Promise<void> {
     this.sent.push({ type: "template", waId, payload: { templateName, components } });
+  }
+
+  async sendImage(waId: string, image: OutboundImage): Promise<void> {
+    this.sent.push({ type: "image", waId, payload: { mimeType: image.mimeType, caption: image.caption, bytes: image.bytes } });
   }
 }
 

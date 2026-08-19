@@ -6,6 +6,7 @@ export interface VendorConfigFile {
     name: string;
     bankAccount: string;
     merchantId?: string;
+    visionFeeCredits?: number;
     escalation: Array<{ role: "owner" | "assistant"; waId: string }>;
     timers?: { approvalMinutes?: number; paymentTtlHours?: number };
     items: Array<{ sku: string; name: string; priceKobo: number; stock: number; active?: boolean }>;
@@ -17,6 +18,7 @@ export interface HydratedVendor {
   name: string;
   bankAccount: string;
   merchantId: string;
+  visionFeeCredits: number;
   escalation: Array<{ role: "owner" | "assistant"; waId: string }>;
   timers: { approvalMinutes: number; paymentTtlHours: number };
   items: Array<{ sku: string; name: string; priceKobo: number; stock: number; active: boolean }>;
@@ -35,6 +37,7 @@ export const DEMO_VENDOR: VendorConfigFile = {
       name: "Parfait Palace",
       bankAccount: "0123456789 · ABC Bank",
       merchantId: "merchant-parfait",
+      visionFeeCredits: 1,
       escalation: [
         { role: "owner", waId: "2348012345678" },
         { role: "assistant", waId: "2348098765432" },
@@ -53,6 +56,7 @@ export function hydrateVendorConfig(file?: VendorConfigFile): HydratedVendorConf
     vendors: src.vendors.map((v) => ({
       ...v,
       merchantId: v.merchantId ?? "merchant-parfait",
+      visionFeeCredits: v.visionFeeCredits ?? 1,
       timers: { ...DEFAULT_TIMERS, ...v.timers },
       items: v.items.map((i) => ({ ...i, active: i.active ?? true })),
     })),
@@ -71,10 +75,4 @@ export function loadVendorConfig(raw?: string): HydratedVendorConfigFile {
 
 export function statusRequiresPayment(status: OrderStatus): boolean {
   return status === "ORDER_PENDING_PAYMENT" || status === "PARTIALLY_PAID";
-}
-
-/** Statuses where the customer is waiting on the business side and the
- * ordering flow must not restart: awaiting payment or manual verification. */
-export function statusHoldsCustomer(status: OrderStatus): boolean {
-  return statusRequiresPayment(status) || status === "MANUAL_VERIFICATION_REQUIRED";
 }

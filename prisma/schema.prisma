@@ -12,7 +12,6 @@ enum OrderStatus {
   ORDER_PENDING_PAYMENT
   PARTIALLY_PAID
   PENDING_APPROVAL
-  MANUAL_VERIFICATION_REQUIRED
   APPROVED
   FAILED_OUT_OF_STOCK
   PENDING_REFUND
@@ -26,6 +25,7 @@ enum PaymentVerdict {
   overpayment
   unmatched
   duplicate
+  manual
 }
 
 enum RefundStatus {
@@ -181,4 +181,14 @@ model IngestedMessage {
   direction String
   status    String
   receivedAt DateTime @default(now())
+}
+
+model ManualReview {
+  orderId      String   @id
+  vendorId     String
+  customerWaId String
+  senderWaId   String
+  mediaMsgId   String
+  notes        String
+  createdAt    DateTime @default(now())
 }

@@ -43,11 +43,28 @@ export interface ConsumeCreditResult {
 
 export interface WalletRepo {
   /**
-   * Atomic credit draw for an approved order (1 credit per order).
-   * Never overdraws live balances; rejects (locked=true) underfunded wallets.
+   * Atomic credit draw. Never overdraws live balances; rejects (locked=true)
+   * underfunded wallets. Used for billable units: one vision call on a
+   * verified receipt (default 1 credit).
    */
-  consumeCredit(merchantId: string, orderId: string, reason: string): Promise<ConsumeCreditResult>;
+  consumeCredit(merchantId: string, orderId: string, reason: string, amount?: number): Promise<ConsumeCreditResult>;
   getBalance(merchantId: string): Promise<number>;
+}
+
+export interface ManualReviewRef {
+  orderId: string;
+  vendorId: string;
+  customerWaId: string;
+  senderWaId: string;
+  mediaMsgId: string;
+  notes: string;
+  createdAt: Date;
+}
+
+export interface ManualReviewRepo {
+  save(ref: ManualReviewRef): Promise<void>;
+  consume(orderId: string): Promise<ManualReviewRef | null>;
+  listPending(): Promise<ManualReviewRef[]>;
 }
 
 export interface PaymentsRepo {
@@ -80,4 +97,5 @@ export interface Repositories {
   refunds: RefundsRepo;
   ingested: IngestedRepo;
   wallet: WalletRepo;
+  manualReviews: ManualReviewRepo;
 }
