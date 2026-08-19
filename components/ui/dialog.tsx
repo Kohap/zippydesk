@@ -20,7 +20,7 @@ export function DialogContent({
       <DialogPrimitive.Content
         className={cn(
           "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-32px)] max-w-md -translate-x-1/2 -translate-y-1/2",
-          "rounded-[14px] border border-line bg-panel-2 p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)]",
+          "max-h-[90dvh] overflow-y-auto rounded-[12px] border border-line bg-panel-2 p-5 shadow-lg",
           className,
         )}
         {...props}
@@ -28,7 +28,7 @@ export function DialogContent({
         {children}
         <DialogPrimitive.Close
           aria-label="Close dialog"
-          className="absolute right-3.5 top-3.5 flex h-9 w-9 items-center justify-center rounded-[10px] text-ink-muted hover:bg-panel-3 hover:text-ink-text"
+          className="absolute right-3.5 top-3.5 flex h-9 w-9 items-center justify-center rounded-[8px] text-ink-muted hover:bg-panel-3 hover:text-ink-text"
         >
           <X className="h-4 w-4" />
         </DialogPrimitive.Close>
