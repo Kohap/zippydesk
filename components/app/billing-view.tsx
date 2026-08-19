@@ -315,7 +315,7 @@ function FuelTankCard({ wallet, onTopUp, onResume }: { wallet: WalletState; onTo
               <Button size="md" className="h-11 bg-white text-ocean hover:bg-white/90" onClick={onTopUp}>
                 Top up credits
               </Button>
-              <p aria-hidden className="flex items-center gap-1.5 self-end text-[12px] text-white/85">
+              <p aria-hidden className="flex items-center gap-1.5 self-end rounded-full border border-white/25 bg-ink/40 px-2.5 py-1 text-[12px] text-white/95">
                 {wallet.balanceCredits > 0 ? (
                   <>
                     <span className="h-1.5 w-1.5 rounded-full bg-white" /> live
@@ -743,7 +743,7 @@ function TopUpDialog({
                     className={cn(
                       "flex flex-col items-start gap-1 rounded-[10px] border px-3.5 py-3 text-left transition-colors",
                       active
-                        ? "border-aqua/60 bg-[rgba(0,188,163,0.08)] text-ink-text"
+                        ? "border-aqua/60 bg-aqua-soft text-ink-text"
                         : "border-line bg-panel text-ink-muted hover:border-line-strong",
                     )}
                   >
@@ -751,7 +751,7 @@ function TopUpDialog({
                       <span className="money text-[18px] text-ink-text">{b.credits.toLocaleString()}</span>
                       <span className="text-[12px] font-normal text-ink-muted">credits</span>
                       {b.bonus ? (
-                        <span className="rounded-[4px] border border-good-line bg-good-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-good-text">
+                        <span className="rounded-[5px] border border-good-line bg-good-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-good-text">
                           +{b.bonus} bonus
                         </span>
                       ) : null}
@@ -794,7 +794,7 @@ function TopUpDialog({
                 className={cn(
                   "flex cursor-pointer items-start gap-3 rounded-[10px] border px-3.5 py-3 transition-colors",
                   method === value
-                    ? "border-aqua/60 bg-[rgba(0,188,163,0.07)]"
+                    ? "border-aqua/60 bg-aqua-soft"
                     : "border-line bg-panel hover:border-line-strong",
                 )}
               >
