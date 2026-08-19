@@ -38,7 +38,7 @@ export function PricingCalculator() {
                     "flex cursor-pointer items-start justify-between gap-3 rounded-[10px] border px-4 py-3.5 transition-colors duration-100",
                     "min-h-[56px] sm:min-h-[60px]",
                     selected
-                      ? "border-aqua/60 bg-[rgba(0,188,163,0.07)]"
+                      ? "border-aqua/60 bg-aqua-soft"
                       : "border-line bg-panel hover:border-line-strong",
                   )}
                 >
