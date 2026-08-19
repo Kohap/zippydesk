@@ -217,7 +217,7 @@ export async function topUpWallet(
     return (await getWallet(ctx, merchantId)) as WalletState;
   }
   const prisma = getPrisma();
-  return prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     const wallet = await tx.wallet.findUnique({ where: { merchantId } });
     if (!wallet) throw new Error("merchant wallet not found");
     const next = wallet.balanceCredits + credits;
@@ -242,8 +242,8 @@ export async function topUpWallet(
       amountKobo: credits * unitKoboForTier(tierForBase(60_000)),
       at: new Date(),
     });
-    return (await getWallet(ctx, merchantId)) as WalletState;
   });
+  return (await getWallet(ctx, merchantId)) as WalletState;
 }
 
 export async function setAutoRecharge(
