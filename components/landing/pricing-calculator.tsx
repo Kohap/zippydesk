@@ -104,7 +104,9 @@ export function PricingCalculator() {
                   {monthlyOrders.toLocaleString()} orders
                   <span className="block text-[12px] text-ink-faint sm:inline">
                     {" "}
-                    ({(monthlyOrders - tier.includedCredits).toLocaleString()} over the tier)
+                    {monthlyOrders > tier.includedCredits
+                      ? `(${(monthlyOrders - tier.includedCredits).toLocaleString()} over the tier)`
+                      : "(within the tier)"}
                   </span>
                 </dt>
                 <dd className="data shrink-0 text-ink-text">{formatNgn(overflowCost)}</dd>

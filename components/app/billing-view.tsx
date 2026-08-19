@@ -558,7 +558,7 @@ function DeductionSimulator({ wallet, onEvent }: { wallet: WalletState; onEvent:
           {toast ? <p role="status" className="text-[12px] text-good">{toast}</p> : null}
           <p className="text-[12px] text-ink-faint">
             In production, Paystack POSTs the event here after your customer&apos;s transfer is verified.
-            The bot runs the deduction in the same transaction that books the order.
+            This simulator drills the credit-deduction and zero-balance lockout path only; it does not book payments onto orders.
           </p>
         </div>
       </CardContent>
@@ -708,7 +708,7 @@ function TopUpDialog({
         throw new Error(body?.error ?? "top-up failed");
       }
       const body = (await res.json()) as { wallet?: { balanceCredits: number } };
-      setDone(`N${total.toLocaleString("en-NG")} booked. Balance is now ${body.wallet?.balanceCredits ?? "?"} credits.`);
+      setDone(`N${(total / 100).toLocaleString("en-NG")} booked. Balance is now ${body.wallet?.balanceCredits ?? "?"} credits.`);
       onDone();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "top-up failed");
@@ -755,7 +755,7 @@ function TopUpDialog({
                     </span>
                     <span className="text-[12px] text-ink-muted">{b.blurb}</span>
                     <span className="data text-[12px] text-ink-faint">
-                      = N{(b.credits * unitKobo).toLocaleString("en-NG")}
+                      = N{((b.credits * unitKobo) / 100).toLocaleString("en-NG")}
                     </span>
                   </button>
                 );

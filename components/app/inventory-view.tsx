@@ -113,11 +113,13 @@ function AddItemDialog({
     setBusy(true);
     setErr(null);
     try {
+      const trimmedSku = sku.trim();
+      if (!/^[A-Z0-9-]+$/.test(trimmedSku)) throw new Error("SKU must use uppercase letters, digits and hyphens");
       const priceKobo = Math.round(Number(price) * 100);
       const stockNum = Number(stock);
       if (!Number.isFinite(priceKobo) || priceKobo < 0) throw new Error("Enter a valid price");
       if (!Number.isInteger(stockNum) || stockNum < 0) throw new Error("Enter a whole number of units in stock");
-      const res = await fetch(`/api/inventory/${encodeURIComponent(sku)}`, {
+      const res = await fetch(`/api/inventory/${encodeURIComponent(trimmedSku)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ vendorId, name, priceKobo, stock: stockNum }),
