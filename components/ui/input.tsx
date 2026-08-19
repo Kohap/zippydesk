@@ -6,8 +6,8 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "h-[46px] w-full rounded-[10px] border border-line-strong bg-panel px-3.5 text-[15px] text-ink-text placeholder:text-ink-faint",
-        "transition-colors duration-100 hover:border-[rgba(255,255,255,0.22)]",
+        "h-[46px] w-full rounded-[8px] border border-line-strong bg-panel px-3.5 text-[15px] text-ink-text placeholder:text-ink-faint",
+        "transition-colors duration-100 hover:border-line-strong",
         "focus:border-aqua focus:outline-none focus:ring-2 focus:ring-aqua/25",
         "disabled:opacity-50",
         className,
@@ -23,8 +23,8 @@ export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttrib
     <select
       ref={ref}
       className={cn(
-        "h-[46px] w-full rounded-[10px] border border-line-strong bg-panel px-3.5 text-[15px] text-ink-text",
-        "transition-colors duration-100 hover:border-[rgba(255,255,255,0.22)]",
+        "h-[46px] w-full rounded-[8px] border border-line-strong bg-panel px-3.5 text-[15px] text-ink-text",
+        "transition-colors duration-100 hover:border-line-strong",
         "focus:border-aqua focus:outline-none focus:ring-2 focus:ring-aqua/25",
         "disabled:opacity-50",
         className,

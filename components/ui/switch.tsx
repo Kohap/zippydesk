@@ -11,7 +11,7 @@ export const Switch = React.forwardRef<
   <SwitchPrimitive.Root
     ref={ref}
     className={cn(
-      "peer inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-full border border-line-strong bg-panel-3 transition-colors duration-150",
+      "peer inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-full border border-line-strong bg-panel-3 transition-colors duration-150 cursor-pointer",
       "data-[state=checked]:border-aqua data-[state=checked]:bg-aqua/85",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aqua focus-visible:ring-offset-2 focus-visible:ring-offset-ink",
       "disabled:cursor-not-allowed disabled:opacity-50",
